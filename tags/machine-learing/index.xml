@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Machine Learing on Jacketex894</title>
-    <link>https://jacketex894.github.io/blog/tags/machine-learing/</link>
+    <link>https://jacketex894.github.io/tags/machine-learing/</link>
     <description>Recent content in Machine Learing on Jacketex894</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-tw</language>
-    <lastBuildDate>Wed, 03 May 2023 23:16:29 +0800</lastBuildDate><atom:link href="https://jacketex894.github.io/blog/tags/machine-learing/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 03 May 2023 23:16:29 +0800</lastBuildDate><atom:link href="https://jacketex894.github.io/tags/machine-learing/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>機器學習基本知識</title>
-      <link>https://jacketex894.github.io/blog/post/ml01/</link>
+      <link>https://jacketex894.github.io/post/ml01/</link>
       <pubDate>Wed, 03 May 2023 23:16:29 +0800</pubDate>
       
-      <guid>https://jacketex894.github.io/blog/post/ml01/</guid>
+      <guid>https://jacketex894.github.io/post/ml01/</guid>
       <description>&lt;h2 id=&#34;定義&#34;&gt;定義&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;機器學習是指不用透過自己設計複雜的rule-based(例如眾多的if或是其他運算)，來讓電腦判斷某件事。可以透過許多的資料來讓電腦學習任務，並將其特性化為數學模型使電腦了解並進而學會如何處理該項任務。&lt;/li&gt;
