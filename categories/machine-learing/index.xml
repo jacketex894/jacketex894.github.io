@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Machine Learing on Jacketex894</title>
+    <link>https://jacketex894.github.io/blog/categories/machine-learing/</link>
+    <description>Recent content in Machine Learing on Jacketex894</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-tw</language>
+    <lastBuildDate>Wed, 03 May 2023 23:16:29 +0800</lastBuildDate><atom:link href="https://jacketex894.github.io/blog/categories/machine-learing/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>機器學習基本知識</title>
+      <link>https://jacketex894.github.io/blog/post/ml01/</link>
+      <pubDate>Wed, 03 May 2023 23:16:29 +0800</pubDate>
+      
+      <guid>https://jacketex894.github.io/blog/post/ml01/</guid>
+      <description>&lt;h2 id=&#34;定義&#34;&gt;定義&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;機器學習是指不用透過自己設計複雜的rule-based(例如眾多的if或是其他運算)，來讓電腦判斷某件事。可以透過許多的資料來讓電腦學習任務，並將其特性化為數學模型使電腦了解並進而學會如何處理該項任務。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;機器學習的種類&#34;&gt;機器學習的種類&lt;/h2&gt;
+&lt;h3 id=&#34;監督式學習&#34;&gt;監督式學習&lt;/h3&gt;
+&lt;p&gt;由人類標記資料，給予機器我們預期會影響判斷的特徵以及相對應的人類標記分類，來讓機器學習。
+Example:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;K Nearest Neighbor&lt;/li&gt;
+&lt;li&gt;Linear regression&lt;/li&gt;
+&lt;li&gt;Support Vector Machine&lt;/li&gt;
+&lt;li&gt;Decision tree&lt;/li&gt;
+&lt;li&gt;Random forest&lt;/li&gt;
+&lt;li&gt;Artificial Neural Network&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;非監督式學習&#34;&gt;非監督式學習&lt;/h3&gt;
+&lt;p&gt;人類不用標記資料，直接給予機器資料，讓機器自己試著去學習。特徵&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;分群法
+&lt;ul&gt;
+&lt;li&gt;K-Means&lt;/li&gt;
+&lt;li&gt;DBSCAN&lt;/li&gt;
+&lt;li&gt;Hierarchical clustering&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;不需要告訴演算法資料屬於哪個分類，演算法會透過給予的特徵找出相似的族群。
+例如:給予演算法一群人的資料來找尋共通點，可能會發現喜歡看神奇寶貝的人，通常在下午五點觀看電視比例比較高(假設下午五點電視在撥放神奇寶貝)&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;異常檢測
+&lt;ul&gt;
+&lt;li&gt;OneClass SVM&lt;/li&gt;
+&lt;li&gt;Isolation Forest&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;在訓練時所收到的資料大部分都是正常的，學習如何辨識他後，當模型看到新的資料時，就可以判斷他是屬於之前學的正常的資料，還是不正常的資料了。&lt;/p&gt;
+&lt;p&gt;另外有類似的任務是新穎檢測(novelty detection)，目的是檢測出跟先前訓練的資料完全不同的新資料。但是它需要非常乾淨的資料，例如我先前的資料有數百隻老鷹的照片，但其中可能混了一些綠繡眼的照片，那麼新穎檢測便不會將其認為是新穎的，但異常偵測則會認為他是稀有案例，並偵測出來。&lt;/p&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;視覺化與降維
+&lt;ul&gt;
+&lt;li&gt;Principal components analysis，PCA&lt;/li&gt;
+&lt;li&gt;kernel PCA&lt;/li&gt;
+&lt;li&gt;Locally Linear Embedding&lt;/li&gt;
+&lt;li&gt;t-distributed Stohastic Neighbor Embedding&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;視覺化:可以將許多資料傳給視覺化的演算法，用2D或3D的方式來呈現資料，或許可以找出先前沒有發現的結構或模式
+降維:在不損失太多資訊的前提下將資料簡化，例如特徵提取(feature extraction)，其作法是將相關性較高的特徵合併成一個特徵，像是一個人會彈的鋼琴曲目數量可能跟他的學習鋼琴多少年有關，那演算法就會將會彈的鋼琴曲目數量跟他學習鋼琴多少年兩個特徵合併為一個特徵。&lt;/p&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;關聯規則學習
+目標挖掘大量資料，找出有哪些關聯的關係，例如買了火鍋料的人可能會順便買醬油。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;半監督學習&#34;&gt;半監督學習&lt;/h3&gt;
+&lt;p&gt;可以處理有部分有標記的資料以及大量無標記的資料的演算法
+Example:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;deep belief networks,DBN&lt;/li&gt;
+&lt;li&gt;restricted Boltzmann machine,RBM&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;強化學習-reinforcement-learning&#34;&gt;強化學習 reinforcement learning&lt;/h3&gt;
+&lt;p&gt;透過獎勵來讓模型學會如何才是最佳選擇，例如:Alpha go&lt;/p&gt;
+&lt;h3 id=&#34;批次與線上學習&#34;&gt;批次與線上學習&lt;/h3&gt;
+&lt;p&gt;系統能不能用持續傳入的資料來逐漸學習&lt;/p&gt;
+&lt;h4 id=&#34;批次學習&#34;&gt;批次學習&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;無法持續學習&lt;/li&gt;
+&lt;li&gt;用目前所有資料學習&lt;/li&gt;
+&lt;li&gt;模型運行後不再學習任何新東西，只運用學過的，稱為Offline Learning。&lt;/li&gt;
+&lt;li&gt;花費資源與時間較大&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;線上學習&#34;&gt;線上學習&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;資料可能是分別傳入或是小批次(mini-batches)&lt;/li&gt;
+&lt;li&gt;也可以藉由線上學習演算法來學習無法完全放入記憶體的巨量資料，此作法被稱為out of core
+&lt;ul&gt;
+&lt;li&gt;通常也是離線執行，所以稱為線上學習可能搞混，也可想成漸進式學習&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;透過learning rate來調整適應新資料的速度
+&lt;ul&gt;
+&lt;li&gt;調高，學習快，但容易快速忘掉舊資料&lt;/li&gt;
+&lt;li&gt;調低，學習慢，但對新資料的雜訊較不敏感&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;instance-based-vs-model-based&#34;&gt;instance-based VS model-based&lt;/h3&gt;
+&lt;h4 id=&#34;instance-based-learning-基於實例學習&#34;&gt;instance-based learning 基於實例學習&lt;/h4&gt;
+&lt;p&gt;系統將資料死背，當要判斷新資料時會將新資料跟學習過的資料作比對，透過相似度來分類。&lt;/p&gt;
+&lt;h4 id=&#34;model-based-learning-基於模型學習&#34;&gt;model-based learning 基於模型學習&lt;/h4&gt;
+&lt;p&gt;從資料中學習，建立模型，在使用模型來進行預測。&lt;/p&gt;
+&lt;h2 id=&#34;過度擬和-overfitting&#34;&gt;過度擬和 overfitting&lt;/h2&gt;
+&lt;p&gt;當模型過度學習時，可能會學習到錯誤的模式。或是找到資料間某種關係，可能在給予的學習資料中，大多被分類到某個分類的資料剛好有些較多的重複點，例如:在判斷某些人的財富時，訓練資料中剛好Michael Jackson 跟 Michael Jordan都很有錢，並且名子中都有個字母M，這種偶然的關係。但實際上應該根據他們的成就、職業或是年紀之類的關係來推論可能比較合理，但是機器學習無法自己判斷偶然的關係是否是偶然還是真實的。&lt;/p&gt;
+&lt;p&gt;當模型的複雜程度遠超過訓練資料的數量時，可能就會出現過擬，可以試著:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;簡化模型:選擇較少參數、減少選擇的資料特徵數量，或約束模型(可以透過正則化(regularization))&lt;/li&gt;
+&lt;li&gt;取得更多訓練資料&lt;/li&gt;
+&lt;li&gt;減少雜訊(移除離群值或修正資料錯誤)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;欠擬-underfitting&#34;&gt;欠擬 underfitting&lt;/h2&gt;
+&lt;p&gt;過擬的相反，模型不夠複雜，無法學習資料的關係。
+可以試著&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;選擇更強的模型或使用更多參數&lt;/li&gt;
+&lt;li&gt;給予模型更好的特徵&lt;/li&gt;
+&lt;li&gt;減少對於模型的約束&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;reference&#34;&gt;Reference&lt;/h4&gt;
+&lt;p&gt;此為我自己看完下列的學習心得
+Hands-On Maching Learning with Scikit-Learn,Keras,and Tensorflow,2nd Edition, by Aurélien Géron. (O&amp;rsquo;Reilly).Copyright 2019 Aurélien Géron, 978-1-492-03264-9&lt;/p&gt;
+&lt;p&gt;此筆記為我在找工作時順便複習機器學習所統整筆記，若有筆誤之處，歡迎告知。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
