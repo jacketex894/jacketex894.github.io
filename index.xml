@@ -6,7 +6,153 @@
         <description>Recent content on Jack&#39;s Note</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-tw</language>
-        <lastBuildDate>Tue, 15 Apr 2025 15:34:43 +0800</lastBuildDate><atom:link href="https://example.com/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Mon, 21 Apr 2025 16:52:48 +0800</lastBuildDate><atom:link href="https://example.com/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Leetcode 228</title>
+        <link>https://example.com/post/leetcode-228/</link>
+        <pubDate>Mon, 21 Apr 2025 16:52:48 +0800</pubDate>
+        
+        <guid>https://example.com/post/leetcode-228/</guid>
+        <description>&lt;h2 id=&#34;題目&#34;&gt;題目
+&lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://leetcode.com/problems/summary-ranges/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;228. Summart Ranges&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;給予一個 sorted 過的數字陣列，要求依照給定的數字陣列中的連續數字輸出字串陣列。
+e.g.
+input : [0,1,2,4,5,7]
+output : [&amp;ldquo;0-&amp;gt;2&amp;rdquo;,&amp;ldquo;4-&amp;gt;5&amp;rdquo;,&amp;ldquo;7&amp;rdquo;]&lt;/p&gt;
+&lt;p&gt;數字陣列中連續數字分別為 [0,1,2] [4,5] [7]。
+所以根據題意可以拆解成三個區間字串 &amp;ldquo;0 -&amp;gt; 2&amp;rdquo; , &amp;ldquo;4 -&amp;gt; 5&amp;rdquo; , &amp;ldquo;7&amp;rdquo;&lt;/p&gt;
+&lt;p&gt;根據題目說明，數字陣列長度可能為 0 ，所以需要考慮此特殊狀況。
+input 的每一個元素都是獨立的，並且從小排到大。&lt;/p&gt;
+&lt;h2 id=&#34;pseudocode&#34;&gt;Pseudocode
+&lt;/h2&gt;&lt;p&gt;首先，先將應實作邏輯整理出來，好讓後面可以使用不同語言實作。
+目的是為了邊學習 go 語言的基本操作。&lt;/p&gt;
+&lt;p&gt;先針對特例做處理，當收到一個空陣列的時候，應該回傳一個空陣列，而不是繼續其他操作。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;如果 input 是 空陣列:
+    回傳空陣列
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;接下來處理連續數字的邏輯:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;當遍歷 input 的時候，需要確認遍歷的元素是否跟前一個元素是連續的。&lt;/li&gt;
+&lt;li&gt;如果不連續的話，便產生一個字串放入需回傳的答案陣列。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;這裡需要兩個陣列:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;temp_arr : 用來存放與確認目前遍歷的元素是否是連續數字所使用。&lt;/li&gt;
+&lt;li&gt;answer : 用來存放要回傳的答案。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# 從第 0 個元素開始存放，迴圈從第 1 個元素開始跟前一個元素比對
+初始化 temp_arr 為 [input[0]]
+初始化 answer 為空陣列
+
+從第 1 個元素開始，逐一遍歷 input 中的元素:
+    如果 當前元素 不等於 temp_arr 最後一個元素 + 1:
+        # 表示不連續，需結束目前區間
+        將 temp_arr 根據題義轉為區間字串並加入 answer
+        初始化 temp_arr 為 [當前元素]
+    否則:
+        將當前元素加入 temp_arr
+
+# 處理最後一段尚未加入的區間
+將 temp_arr 根據題義轉為區間字串並加入 answer
+
+回傳 answer
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;根據題義產生區間字串的過程，由於在遍歷與遍歷完成後都需要使用到，所以另外寫成 function，方便修改。
+根據題義產生區間字串會需要連續數字的第 0 個數字 + &amp;ldquo;-&amp;gt;&amp;rdquo; + 最後一個數字。
+但是如果如果不連續，只有單一個數字的話，則只要輸出該數字即可。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;字串 = temp_arr 中的第0個元素
+如果 temp_arr 的大小超過 1:
+    字串加上 &amp;#34;-&amp;gt;&amp;#34; 以及 最後一個元素
+回傳字串
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;子函式產生區間字串&#34;&gt;子函式：產生區間字串
+&lt;/h3&gt;&lt;p&gt;Input : temp_arr，一個包含連續整數的子區段
+Output : 符合題目格式的字串表示，例如 &amp;ldquo;1-&amp;gt;3&amp;rdquo; 或 &amp;ldquo;5&amp;rdquo;&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;初始化 字串 為 temp_arr 的第一個元素（轉成字串）
+
+如果 temp_arr 的長度大於 1:
+    將字串加上 &amp;#34;-&amp;gt;&amp;#34; 和 temp_arr 的最後一個元素（轉成字串）
+
+回傳字串
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Note:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果只有一個數字，直接輸出該數字。&lt;/li&gt;
+&lt;li&gt;如果是一段連續區間（例如 [1,2,3]），輸出 &amp;ldquo;1-&amp;gt;3&amp;rdquo;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;主函式&#34;&gt;主函式
+&lt;/h3&gt;&lt;p&gt;Input : 一個遞增排序的整數陣列 nums（無重複）
+output : 將所有連續的整數區段，以字串格式表示的陣列&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;如果 input 是 空陣列:
+    回傳空陣列
+
+# 從第 0 個元素開始存放，迴圈從第 1 個元素開始跟前一個元素比對
+初始化 temp_arr 為 [input[0]]
+初始化 answer 為空陣列
+
+從第 1 個元素開始，逐一遍歷 input 中的元素:
+    如果 當前元素 不等於 temp_arr 最後一個元素 + 1:
+        # 表示不連續，需結束目前區間
+        將 temp_arr 根據題義轉為字串並加入 answer
+        初始化 temp_arr 為 [當前元素]
+    否則:
+        將當前元素加入 temp_arr
+
+# 處理最後一段尚未加入的區間
+將 temp_arr 根據題義轉為字串並加入 answer
+
+回傳 answer
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;python&#34;&gt;Python
+&lt;/h2&gt;&lt;p&gt;用熟悉的 python 實作，驗證邏輯&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;class Solution:
+    def get_answer_string(self,temp_arr: List[int]) -&amp;gt; str:
+        answer_string  = f&amp;#34;{temp_arr[0]}&amp;#34;
+        if len(temp_arr) &amp;gt; 1:
+            answer_string += f&amp;#34;-&amp;gt;{temp_arr[-1]}&amp;#34;
+        return answer_string
+    def summaryRanges(self, nums: List[int]) -&amp;gt; List[str]:
+        if not len(nums):
+            return []
+        temp_arr = [nums[0]]
+        answer = []
+        for index in range(1,len(nums)):
+            if nums[index] - 1 != temp_arr[-1]:
+                answer_string = self.get_answer_string(temp_arr)
+                temp_arr = [nums[index]]
+                answer.append(answer_string)
+            else:
+                temp_arr.append(nums[index])
+        answer_string = self.get_answer_string(temp_arr)
+        answer.append(answer_string)
+        return answer
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;go&#34;&gt;GO
+&lt;/h2&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;import &amp;#34;strconv&amp;#34;
+
+func get_answer_string(temp_arr [] int) string{
+    answer_string := strconv.Itoa(temp_arr[0])
+    if len(temp_arr) &amp;gt; 1{
+        answer_string += &amp;#34;-&amp;gt;&amp;#34; + strconv.Itoa(temp_arr[len(temp_arr) - 1])
+    }
+    return answer_string
+}
+func summaryRanges(nums []int) []string {
+    if len(nums) == 0{
+        return []string{}
+    }
+    var temp_arr = []int{}
+    var answer = []string{}
+    temp_arr = append(temp_arr,nums[0])
+    for index := 1 ; index &amp;lt; len(nums); index ++{
+        if nums[index] - 1  != temp_arr[len(temp_arr) - 1]{
+            answer_string := get_answer_string(temp_arr)
+            answer = append(answer,answer_string)
+            temp_arr = []int{}
+        }
+        temp_arr = append(temp_arr,nums[index])
+    }
+    answer_string := get_answer_string(temp_arr)
+    answer = append(answer,answer_string)
+return answer
+}
+&lt;/code&gt;&lt;/pre&gt;</description>
+        </item>
+        <item>
         <title>JWT Note</title>
         <link>https://example.com/post/jwt/</link>
         <pubDate>Tue, 15 Apr 2025 15:34:43 +0800</pubDate>

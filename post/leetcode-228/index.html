@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-tw" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="題目 228. Summart Ranges\n給予一個 sorted 過的數字陣列，要求依照給定的數字陣列中的連續數字輸出字串陣列。 e.g. input : [0,1,2,4,5,7] output : [&ldquo;0-&gt;2&rdquo;,&ldquo;4-&gt;5&rdquo;,&ldquo;7&rdquo;]\n數字陣列中連續數字分別為 [0,1,2] [4,5] [7]。 所以根據題意可以拆解成三個區間字串 &ldquo;0 -&gt; 2&rdquo; , &ldquo;4 -&gt; 5&rdquo; , &ldquo;7&rdquo;\n根據題目說明，數字陣列長度可能為 0 ，所以需要考慮此特殊狀況。 input 的每一個元素都是獨立的，並且從小排到大。\nPseudocode 首先，先將應實作邏輯整理出來，好讓後面可以使用不同語言實作。 目的是為了邊學習 go 語言的基本操作。\n先針對特例做處理，當收到一個空陣列的時候，應該回傳一個空陣列，而不是繼續其他操作。\n如果 input 是 空陣列: 回傳空陣列 接下來處理連續數字的邏輯:\n當遍歷 input 的時候，需要確認遍歷的元素是否跟前一個元素是連續的。 如果不連續的話，便產生一個字串放入需回傳的答案陣列。 這裡需要兩個陣列:\ntemp_arr : 用來存放與確認目前遍歷的元素是否是連續數字所使用。 answer : 用來存放要回傳的答案。 # 從第 0 個元素開始存放，迴圈從第 1 個元素開始跟前一個元素比對 初始化 temp_arr 為 [input[0]] 初始化 answer 為空陣列 從第 1 個元素開始，逐一遍歷 input 中的元素: 如果 當前元素 不等於 temp_arr 最後一個元素 + 1: # 表示不連續，需結束目前區間 將 temp_arr 根據題義轉為區間字串並加入 answer 初始化 temp_arr 為 [當前元素] 否則: 將當前元素加入 temp_arr # 處理最後一段尚未加入的區間 將 temp_arr 根據題義轉為區間字串並加入 answer 回傳 answer 根據題義產生區間字串的過程，由於在遍歷與遍歷完成後都需要使用到，所以另外寫成 function，方便修改。 根據題義產生區間字串會需要連續數字的第 0 個數字 + &ldquo;-&gt;&rdquo; + 最後一個數字。 但是如果如果不連續，只有單一個數字的話，則只要輸出該數字即可。\n">
+<title>Leetcode 228</title>
+
+<link rel='canonical' href='https://example.com/post/leetcode-228/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Leetcode 228">
+<meta property='og:description' content="題目 228. Summart Ranges\n給予一個 sorted 過的數字陣列，要求依照給定的數字陣列中的連續數字輸出字串陣列。 e.g. input : [0,1,2,4,5,7] output : [&ldquo;0-&gt;2&rdquo;,&ldquo;4-&gt;5&rdquo;,&ldquo;7&rdquo;]\n數字陣列中連續數字分別為 [0,1,2] [4,5] [7]。 所以根據題意可以拆解成三個區間字串 &ldquo;0 -&gt; 2&rdquo; , &ldquo;4 -&gt; 5&rdquo; , &ldquo;7&rdquo;\n根據題目說明，數字陣列長度可能為 0 ，所以需要考慮此特殊狀況。 input 的每一個元素都是獨立的，並且從小排到大。\nPseudocode 首先，先將應實作邏輯整理出來，好讓後面可以使用不同語言實作。 目的是為了邊學習 go 語言的基本操作。\n先針對特例做處理，當收到一個空陣列的時候，應該回傳一個空陣列，而不是繼續其他操作。\n如果 input 是 空陣列: 回傳空陣列 接下來處理連續數字的邏輯:\n當遍歷 input 的時候，需要確認遍歷的元素是否跟前一個元素是連續的。 如果不連續的話，便產生一個字串放入需回傳的答案陣列。 這裡需要兩個陣列:\ntemp_arr : 用來存放與確認目前遍歷的元素是否是連續數字所使用。 answer : 用來存放要回傳的答案。 # 從第 0 個元素開始存放，迴圈從第 1 個元素開始跟前一個元素比對 初始化 temp_arr 為 [input[0]] 初始化 answer 為空陣列 從第 1 個元素開始，逐一遍歷 input 中的元素: 如果 當前元素 不等於 temp_arr 最後一個元素 + 1: # 表示不連續，需結束目前區間 將 temp_arr 根據題義轉為區間字串並加入 answer 初始化 temp_arr 為 [當前元素] 否則: 將當前元素加入 temp_arr # 處理最後一段尚未加入的區間 將 temp_arr 根據題義轉為區間字串並加入 answer 回傳 answer 根據題義產生區間字串的過程，由於在遍歷與遍歷完成後都需要使用到，所以另外寫成 function，方便修改。 根據題義產生區間字串會需要連續數字的第 0 個數字 + &ldquo;-&gt;&rdquo; + 最後一個數字。 但是如果如果不連續，只有單一個數字的話，則只要輸出該數字即可。\n">
+<meta property='og:url' content='https://example.com/post/leetcode-228/'>
+<meta property='og:site_name' content='Jack&#39;s Note'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-04-21T16:52:48&#43;08:00'/><meta property='article:modified_time' content='2025-04-21T16:52:48&#43;08:00'/>
+<meta name="twitter:title" content="Leetcode 228">
+<meta name="twitter:description" content="題目 228. Summart Ranges\n給予一個 sorted 過的數字陣列，要求依照給定的數字陣列中的連續數字輸出字串陣列。 e.g. input : [0,1,2,4,5,7] output : [&ldquo;0-&gt;2&rdquo;,&ldquo;4-&gt;5&rdquo;,&ldquo;7&rdquo;]\n數字陣列中連續數字分別為 [0,1,2] [4,5] [7]。 所以根據題意可以拆解成三個區間字串 &ldquo;0 -&gt; 2&rdquo; , &ldquo;4 -&gt; 5&rdquo; , &ldquo;7&rdquo;\n根據題目說明，數字陣列長度可能為 0 ，所以需要考慮此特殊狀況。 input 的每一個元素都是獨立的，並且從小排到大。\nPseudocode 首先，先將應實作邏輯整理出來，好讓後面可以使用不同語言實作。 目的是為了邊學習 go 語言的基本操作。\n先針對特例做處理，當收到一個空陣列的時候，應該回傳一個空陣列，而不是繼續其他操作。\n如果 input 是 空陣列: 回傳空陣列 接下來處理連續數字的邏輯:\n當遍歷 input 的時候，需要確認遍歷的元素是否跟前一個元素是連續的。 如果不連續的話，便產生一個字串放入需回傳的答案陣列。 這裡需要兩個陣列:\ntemp_arr : 用來存放與確認目前遍歷的元素是否是連續數字所使用。 answer : 用來存放要回傳的答案。 # 從第 0 個元素開始存放，迴圈從第 1 個元素開始跟前一個元素比對 初始化 temp_arr 為 [input[0]] 初始化 answer 為空陣列 從第 1 個元素開始，逐一遍歷 input 中的元素: 如果 當前元素 不等於 temp_arr 最後一個元素 + 1: # 表示不連續，需結束目前區間 將 temp_arr 根據題義轉為區間字串並加入 answer 初始化 temp_arr 為 [當前元素] 否則: 將當前元素加入 temp_arr # 處理最後一段尚未加入的區間 將 temp_arr 根據題義轉為區間字串並加入 answer 回傳 answer 根據題義產生區間字串的過程，由於在遍歷與遍歷完成後都需要使用到，所以另外寫成 function，方便修改。 根據題義產生區間字串會需要連續數字的第 0 個數字 + &ldquo;-&gt;&rdquo; + 最後一個數字。 但是如果如果不連續，只有單一個數字的話，則只要輸出該數字即可。\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切換選單">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu_f509edb42ecc0ebd.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Jack&#39;s Note</a></h1>
+            <h2 class="site-description">Learning note</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/jacketex894'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>夜晚模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/leetcode-228/">Leetcode 228</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Apr 21, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    閱讀時間: 2 分鐘
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="題目">題目
+</h2><p><a class="link" href="https://leetcode.com/problems/summary-ranges/"  target="_blank" rel="noopener"
+    >228. Summart Ranges</a></p>
+<p>給予一個 sorted 過的數字陣列，要求依照給定的數字陣列中的連續數字輸出字串陣列。
+e.g.
+input : [0,1,2,4,5,7]
+output : [&ldquo;0-&gt;2&rdquo;,&ldquo;4-&gt;5&rdquo;,&ldquo;7&rdquo;]</p>
+<p>數字陣列中連續數字分別為 [0,1,2] [4,5] [7]。
+所以根據題意可以拆解成三個區間字串 &ldquo;0 -&gt; 2&rdquo; , &ldquo;4 -&gt; 5&rdquo; , &ldquo;7&rdquo;</p>
+<p>根據題目說明，數字陣列長度可能為 0 ，所以需要考慮此特殊狀況。
+input 的每一個元素都是獨立的，並且從小排到大。</p>
+<h2 id="pseudocode">Pseudocode
+</h2><p>首先，先將應實作邏輯整理出來，好讓後面可以使用不同語言實作。
+目的是為了邊學習 go 語言的基本操作。</p>
+<p>先針對特例做處理，當收到一個空陣列的時候，應該回傳一個空陣列，而不是繼續其他操作。</p>
+<pre tabindex="0"><code>如果 input 是 空陣列:
+    回傳空陣列
+</code></pre><p>接下來處理連續數字的邏輯:</p>
+<ol>
+<li>當遍歷 input 的時候，需要確認遍歷的元素是否跟前一個元素是連續的。</li>
+<li>如果不連續的話，便產生一個字串放入需回傳的答案陣列。</li>
+</ol>
+<p>這裡需要兩個陣列:</p>
+<ol>
+<li>temp_arr : 用來存放與確認目前遍歷的元素是否是連續數字所使用。</li>
+<li>answer : 用來存放要回傳的答案。</li>
+</ol>
+<pre tabindex="0"><code># 從第 0 個元素開始存放，迴圈從第 1 個元素開始跟前一個元素比對
+初始化 temp_arr 為 [input[0]]
+初始化 answer 為空陣列
+
+從第 1 個元素開始，逐一遍歷 input 中的元素:
+    如果 當前元素 不等於 temp_arr 最後一個元素 + 1:
+        # 表示不連續，需結束目前區間
+        將 temp_arr 根據題義轉為區間字串並加入 answer
+        初始化 temp_arr 為 [當前元素]
+    否則:
+        將當前元素加入 temp_arr
+
+# 處理最後一段尚未加入的區間
+將 temp_arr 根據題義轉為區間字串並加入 answer
+
+回傳 answer
+</code></pre><p>根據題義產生區間字串的過程，由於在遍歷與遍歷完成後都需要使用到，所以另外寫成 function，方便修改。
+根據題義產生區間字串會需要連續數字的第 0 個數字 + &ldquo;-&gt;&rdquo; + 最後一個數字。
+但是如果如果不連續，只有單一個數字的話，則只要輸出該數字即可。</p>
+<pre tabindex="0"><code>字串 = temp_arr 中的第0個元素
+如果 temp_arr 的大小超過 1:
+    字串加上 &#34;-&gt;&#34; 以及 最後一個元素
+回傳字串
+</code></pre><h3 id="子函式產生區間字串">子函式：產生區間字串
+</h3><p>Input : temp_arr，一個包含連續整數的子區段
+Output : 符合題目格式的字串表示，例如 &ldquo;1-&gt;3&rdquo; 或 &ldquo;5&rdquo;</p>
+<pre tabindex="0"><code>初始化 字串 為 temp_arr 的第一個元素（轉成字串）
+
+如果 temp_arr 的長度大於 1:
+    將字串加上 &#34;-&gt;&#34; 和 temp_arr 的最後一個元素（轉成字串）
+
+回傳字串
+</code></pre><p>Note:</p>
+<ul>
+<li>如果只有一個數字，直接輸出該數字。</li>
+<li>如果是一段連續區間（例如 [1,2,3]），輸出 &ldquo;1-&gt;3&rdquo;。</li>
+</ul>
+<h3 id="主函式">主函式
+</h3><p>Input : 一個遞增排序的整數陣列 nums（無重複）
+output : 將所有連續的整數區段，以字串格式表示的陣列</p>
+<pre tabindex="0"><code>如果 input 是 空陣列:
+    回傳空陣列
+
+# 從第 0 個元素開始存放，迴圈從第 1 個元素開始跟前一個元素比對
+初始化 temp_arr 為 [input[0]]
+初始化 answer 為空陣列
+
+從第 1 個元素開始，逐一遍歷 input 中的元素:
+    如果 當前元素 不等於 temp_arr 最後一個元素 + 1:
+        # 表示不連續，需結束目前區間
+        將 temp_arr 根據題義轉為字串並加入 answer
+        初始化 temp_arr 為 [當前元素]
+    否則:
+        將當前元素加入 temp_arr
+
+# 處理最後一段尚未加入的區間
+將 temp_arr 根據題義轉為字串並加入 answer
+
+回傳 answer
+</code></pre><h2 id="python">Python
+</h2><p>用熟悉的 python 實作，驗證邏輯</p>
+<pre tabindex="0"><code>class Solution:
+    def get_answer_string(self,temp_arr: List[int]) -&gt; str:
+        answer_string  = f&#34;{temp_arr[0]}&#34;
+        if len(temp_arr) &gt; 1:
+            answer_string += f&#34;-&gt;{temp_arr[-1]}&#34;
+        return answer_string
+    def summaryRanges(self, nums: List[int]) -&gt; List[str]:
+        if not len(nums):
+            return []
+        temp_arr = [nums[0]]
+        answer = []
+        for index in range(1,len(nums)):
+            if nums[index] - 1 != temp_arr[-1]:
+                answer_string = self.get_answer_string(temp_arr)
+                temp_arr = [nums[index]]
+                answer.append(answer_string)
+            else:
+                temp_arr.append(nums[index])
+        answer_string = self.get_answer_string(temp_arr)
+        answer.append(answer_string)
+        return answer
+</code></pre><h2 id="go">GO
+</h2><pre tabindex="0"><code>import &#34;strconv&#34;
+
+func get_answer_string(temp_arr [] int) string{
+    answer_string := strconv.Itoa(temp_arr[0])
+    if len(temp_arr) &gt; 1{
+        answer_string += &#34;-&gt;&#34; + strconv.Itoa(temp_arr[len(temp_arr) - 1])
+    }
+    return answer_string
+}
+func summaryRanges(nums []int) []string {
+    if len(nums) == 0{
+        return []string{}
+    }
+    var temp_arr = []int{}
+    var answer = []string{}
+    temp_arr = append(temp_arr,nums[0])
+    for index := 1 ; index &lt; len(nums); index ++{
+        if nums[index] - 1  != temp_arr[len(temp_arr) - 1]{
+            answer_string := get_answer_string(temp_arr)
+            answer = append(answer,answer_string)
+            temp_arr = []int{}
+        }
+        temp_arr = append(temp_arr,nums[index])
+    }
+    answer_string := get_answer_string(temp_arr)
+    answer = append(answer,answer_string)
+return answer
+}
+</code></pre>
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2025 Jack&#39;s Note
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 建立 <br />
+        主題 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 設計
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
