@@ -80,8 +80,8 @@ apple 5
         <guid>https://example.com/post/leetcode-217/</guid>
         <description>&lt;h2 id=&#34;題目&#34;&gt;題目
 &lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://leetcode.com/problems/contains-duplicate/description/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;217. Contains Duplicate&lt;/a&gt;
-給予一個數字陣列 nums，如果陣列中有重複的元素就回傳 True, 否則回傳 False。&lt;/p&gt;
+    &gt;217. Contains Duplicate&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;給予一個數字陣列 nums，如果陣列中有重複的元素就回傳 True, 否則回傳 False。&lt;/p&gt;
 &lt;h2 id=&#34;pseudocode&#34;&gt;Pseudocode
 &lt;/h2&gt;&lt;p&gt;這題是蠻簡單的題目，可以透過將元素存入類似 python 的 dict，這類的 hash table 來解決。&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;從第一個元素開始，逐一遍歷 nums 中的每一個元素:
