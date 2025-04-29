@@ -6,7 +6,56 @@
         <description>Recent content in Posts on Jack&#39;s Note</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-tw</language>
-        <lastBuildDate>Tue, 29 Apr 2025 14:37:14 +0800</lastBuildDate><atom:link href="https://example.com/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Tue, 29 Apr 2025 18:35:49 +0800</lastBuildDate><atom:link href="https://example.com/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Leetcode 242</title>
+        <link>https://example.com/post/leetcode-242/</link>
+        <pubDate>Tue, 29 Apr 2025 18:35:49 +0800</pubDate>
+        
+        <guid>https://example.com/post/leetcode-242/</guid>
+        <description>&lt;h2 id=&#34;題目&#34;&gt;題目
+&lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://leetcode.com/problems/valid-anagram&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;242. Valid Anagram&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;給予兩個字串 s 跟 t ， 判斷 t 是否是 s 的 anagram。
+是的話回傳 true ， 不是的話，回傳 False。
+anagram 指的是 t 字串的字元是否完全來自於 s ，並且每一個字元只被使用一次。&lt;/p&gt;
+&lt;h2 id=&#34;pseudocode&#34;&gt;Pseudocode
+&lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://example.com/post/leetcode-217/&#34; &gt;leetcode-217&lt;/a&gt; 的延伸題。&lt;/p&gt;
+&lt;p&gt;根據題義可以判斷 s 跟 t 的長度必須相同，所以當長度不同便可直接回傳 false。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;如果 s 的長度不等於 t 的長度:
+    回傳 false
+
+從第 0 個字元開始，逐一遍歷 s 的每一個字元:
+    紀錄字元出現的頻率
+從第 0 個字元開始，逐一遍歷 t 的每一個字元:
+    比對字元是否在 s 出現過，以及是否超過 s 的頻率，若並未出現過或超出頻率:
+        回傳 false
+通過所有檢查，回傳 true
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;時間複雜度:O(N)&lt;/p&gt;
+&lt;h2 id=&#34;go&#34;&gt;Go
+&lt;/h2&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;func isAnagram(s string, t string) bool {
+    if len(s) != len(t){
+        return false
+    }
+    appear := map[byte]int{}
+
+    for index := 0 ; index &amp;lt; len(s) ; index += 1{
+        if _,ok := appear[s[index]]; !ok{
+            appear[s[index]] = 0
+        }
+        appear[s[index]] += 1
+    }
+    for index:=0 ; index &amp;lt; len(t) ; index += 1{
+        if value,ok := appear[t[index]]; ok &amp;amp;&amp;amp; value &amp;gt; 0{
+            appear[t[index]] -= 1
+        }else{
+            return false
+        }
+    }
+    return true
+}
+&lt;/code&gt;&lt;/pre&gt;</description>
+        </item>
+        <item>
         <title>Go Map</title>
         <link>https://example.com/post/go-map/</link>
         <pubDate>Tue, 29 Apr 2025 14:37:14 +0800</pubDate>
@@ -84,7 +133,7 @@ apple 5
 &lt;p&gt;給予一個數字陣列 nums，如果陣列中有重複的元素就回傳 True, 否則回傳 False。&lt;/p&gt;
 &lt;h2 id=&#34;pseudocode&#34;&gt;Pseudocode
 &lt;/h2&gt;&lt;p&gt;這題是蠻簡單的題目，可以透過將元素存入類似 python 的 dict，這類的 hash table 來解決。&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;從第一個元素開始，逐一遍歷 nums 中的每一個元素:
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;從第 0 個元素開始，逐一遍歷 nums 中的每一個元素:
     如果元素沒有出現過:
         將元素紀錄下來用於比對是否出現過
     如果元束出現過:

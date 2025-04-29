@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-tw" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="題目 217. Contains Duplicate\n給予一個數字陣列 nums，如果陣列中有重複的元素就回傳 True, 否則回傳 False。\nPseudocode 這題是蠻簡單的題目，可以透過將元素存入類似 python 的 dict，這類的 hash table 來解決。\n從第 0 個元素開始，逐一遍歷 nums 中的每一個元素: 如果元素沒有出現過: 將元素紀錄下來用於比對是否出現過 如果元束出現過: 回傳 True 值 當遍歷完 nums 依然沒有重複元素: 回傳 False 值 Go func containsDuplicate(nums []int) bool { appear := map[int]bool{} for i := 0 ; i &lt; len(nums) ; i ++{ if _,ok := appear[nums[i]]; ok{ return true }else{ appear[nums[i]] = true } } return false } 主要使用了 map 來紀錄出現過的元素。 關於 map 請參考 go-map\n">
-<title>Leetcode 217</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="題目 242. Valid Anagram\n給予兩個字串 s 跟 t ， 判斷 t 是否是 s 的 anagram。 是的話回傳 true ， 不是的話，回傳 False。 anagram 指的是 t 字串的字元是否完全來自於 s ，並且每一個字元只被使用一次。\nPseudocode leetcode-217 的延伸題。\n根據題義可以判斷 s 跟 t 的長度必須相同，所以當長度不同便可直接回傳 false。\n如果 s 的長度不等於 t 的長度: 回傳 false 從第 0 個字元開始，逐一遍歷 s 的每一個字元: 紀錄字元出現的頻率 從第 0 個字元開始，逐一遍歷 t 的每一個字元: 比對字元是否在 s 出現過，以及是否超過 s 的頻率，若並未出現過或超出頻率: 回傳 false 通過所有檢查，回傳 true 時間複雜度:O(N)\nGo func isAnagram(s string, t string) bool { if len(s) != len(t){ return false } appear := map[byte]int{} for index := 0 ; index &lt; len(s) ; index += 1{ if _,ok := appear[s[index]]; !ok{ appear[s[index]] = 0 } appear[s[index]] += 1 } for index:=0 ; index &lt; len(t) ; index += 1{ if value,ok := appear[t[index]]; ok &amp;&amp; value &gt; 0{ appear[t[index]] -= 1 }else{ return false } } return true } ">
+<title>Leetcode 242</title>
 
-<link rel='canonical' href='https://example.com/post/leetcode-217/'>
+<link rel='canonical' href='https://example.com/post/leetcode-242/'>
 
-<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Leetcode 217">
-<meta property='og:description' content="題目 217. Contains Duplicate\n給予一個數字陣列 nums，如果陣列中有重複的元素就回傳 True, 否則回傳 False。\nPseudocode 這題是蠻簡單的題目，可以透過將元素存入類似 python 的 dict，這類的 hash table 來解決。\n從第 0 個元素開始，逐一遍歷 nums 中的每一個元素: 如果元素沒有出現過: 將元素紀錄下來用於比對是否出現過 如果元束出現過: 回傳 True 值 當遍歷完 nums 依然沒有重複元素: 回傳 False 值 Go func containsDuplicate(nums []int) bool { appear := map[int]bool{} for i := 0 ; i &lt; len(nums) ; i ++{ if _,ok := appear[nums[i]]; ok{ return true }else{ appear[nums[i]] = true } } return false } 主要使用了 map 來紀錄出現過的元素。 關於 map 請參考 go-map\n">
-<meta property='og:url' content='https://example.com/post/leetcode-217/'>
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Leetcode 242">
+<meta property='og:description' content="題目 242. Valid Anagram\n給予兩個字串 s 跟 t ， 判斷 t 是否是 s 的 anagram。 是的話回傳 true ， 不是的話，回傳 False。 anagram 指的是 t 字串的字元是否完全來自於 s ，並且每一個字元只被使用一次。\nPseudocode leetcode-217 的延伸題。\n根據題義可以判斷 s 跟 t 的長度必須相同，所以當長度不同便可直接回傳 false。\n如果 s 的長度不等於 t 的長度: 回傳 false 從第 0 個字元開始，逐一遍歷 s 的每一個字元: 紀錄字元出現的頻率 從第 0 個字元開始，逐一遍歷 t 的每一個字元: 比對字元是否在 s 出現過，以及是否超過 s 的頻率，若並未出現過或超出頻率: 回傳 false 通過所有檢查，回傳 true 時間複雜度:O(N)\nGo func isAnagram(s string, t string) bool { if len(s) != len(t){ return false } appear := map[byte]int{} for index := 0 ; index &lt; len(s) ; index += 1{ if _,ok := appear[s[index]]; !ok{ appear[s[index]] = 0 } appear[s[index]] += 1 } for index:=0 ; index &lt; len(t) ; index += 1{ if value,ok := appear[t[index]]; ok &amp;&amp; value &gt; 0{ appear[t[index]] -= 1 }else{ return false } } return true } ">
+<meta property='og:url' content='https://example.com/post/leetcode-242/'>
 <meta property='og:site_name' content='Jack&#39;s Note'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-04-27T11:44:03&#43;08:00'/><meta property='article:modified_time' content='2025-04-27T11:44:03&#43;08:00'/>
-<meta name="twitter:title" content="Leetcode 217">
-<meta name="twitter:description" content="題目 217. Contains Duplicate\n給予一個數字陣列 nums，如果陣列中有重複的元素就回傳 True, 否則回傳 False。\nPseudocode 這題是蠻簡單的題目，可以透過將元素存入類似 python 的 dict，這類的 hash table 來解決。\n從第 0 個元素開始，逐一遍歷 nums 中的每一個元素: 如果元素沒有出現過: 將元素紀錄下來用於比對是否出現過 如果元束出現過: 回傳 True 值 當遍歷完 nums 依然沒有重複元素: 回傳 False 值 Go func containsDuplicate(nums []int) bool { appear := map[int]bool{} for i := 0 ; i &lt; len(nums) ; i ++{ if _,ok := appear[nums[i]]; ok{ return true }else{ appear[nums[i]] = true } } return false } 主要使用了 map 來紀錄出現過的元素。 關於 map 請參考 go-map\n">
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-04-29T18:35:49&#43;08:00'/><meta property='article:modified_time' content='2025-04-29T18:35:49&#43;08:00'/>
+<meta name="twitter:title" content="Leetcode 242">
+<meta name="twitter:description" content="題目 242. Valid Anagram\n給予兩個字串 s 跟 t ， 判斷 t 是否是 s 的 anagram。 是的話回傳 true ， 不是的話，回傳 False。 anagram 指的是 t 字串的字元是否完全來自於 s ，並且每一個字元只被使用一次。\nPseudocode leetcode-217 的延伸題。\n根據題義可以判斷 s 跟 t 的長度必須相同，所以當長度不同便可直接回傳 false。\n如果 s 的長度不等於 t 的長度: 回傳 false 從第 0 個字元開始，逐一遍歷 s 的每一個字元: 紀錄字元出現的頻率 從第 0 個字元開始，逐一遍歷 t 的每一個字元: 比對字元是否在 s 出現過，以及是否超過 s 的頻率，若並未出現過或超出頻率: 回傳 false 通過所有檢查，回傳 true 時間複雜度:O(N)\nGo func isAnagram(s string, t string) bool { if len(s) != len(t){ return false } appear := map[byte]int{} for index := 0 ; index &lt; len(s) ; index += 1{ if _,ok := appear[s[index]]; !ok{ appear[s[index]] = 0 } appear[s[index]] += 1 } for index:=0 ; index &lt; len(t) ; index += 1{ if value,ok := appear[t[index]]; ok &amp;&amp; value &gt; 0{ appear[t[index]] -= 1 }else{ return false } } return true } ">
     </head>
     <body class="
     article-page
@@ -155,7 +155,7 @@
 
     <div class="article-title-wrapper">
         <h2 class="article-title">
-            <a href="/post/leetcode-217/">Leetcode 217</a>
+            <a href="/post/leetcode-242/">Leetcode 242</a>
         </h2>
     
         
@@ -177,7 +177,7 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published">Apr 27, 2025</time>
+                <time class="article-time--published">Apr 29, 2025</time>
             </div>
         
 
@@ -208,33 +208,47 @@
     
     
     <h2 id="題目">題目
-</h2><p><a class="link" href="https://leetcode.com/problems/contains-duplicate/description/"  target="_blank" rel="noopener"
-    >217. Contains Duplicate</a></p>
-<p>給予一個數字陣列 nums，如果陣列中有重複的元素就回傳 True, 否則回傳 False。</p>
+</h2><p><a class="link" href="https://leetcode.com/problems/valid-anagram"  target="_blank" rel="noopener"
+    >242. Valid Anagram</a></p>
+<p>給予兩個字串 s 跟 t ， 判斷 t 是否是 s 的 anagram。
+是的話回傳 true ， 不是的話，回傳 False。
+anagram 指的是 t 字串的字元是否完全來自於 s ，並且每一個字元只被使用一次。</p>
 <h2 id="pseudocode">Pseudocode
-</h2><p>這題是蠻簡單的題目，可以透過將元素存入類似 python 的 dict，這類的 hash table 來解決。</p>
-<pre tabindex="0"><code>從第 0 個元素開始，逐一遍歷 nums 中的每一個元素:
-    如果元素沒有出現過:
-        將元素紀錄下來用於比對是否出現過
-    如果元束出現過:
-        回傳 True 值
-當遍歷完 nums 依然沒有重複元素:
-回傳 False 值
-</code></pre><h2 id="go">Go
-</h2><pre tabindex="0"><code>func containsDuplicate(nums []int) bool {
-    appear := map[int]bool{}
-    for i := 0 ; i &lt; len(nums) ; i ++{
-        if _,ok := appear[nums[i]]; ok{
-            return true
+</h2><p><a class="link" href="/post/leetcode-217/" >leetcode-217</a> 的延伸題。</p>
+<p>根據題義可以判斷 s 跟 t 的長度必須相同，所以當長度不同便可直接回傳 false。</p>
+<pre tabindex="0"><code>如果 s 的長度不等於 t 的長度:
+    回傳 false
+
+從第 0 個字元開始，逐一遍歷 s 的每一個字元:
+    紀錄字元出現的頻率
+從第 0 個字元開始，逐一遍歷 t 的每一個字元:
+    比對字元是否在 s 出現過，以及是否超過 s 的頻率，若並未出現過或超出頻率:
+        回傳 false
+通過所有檢查，回傳 true
+</code></pre><p>時間複雜度:O(N)</p>
+<h2 id="go">Go
+</h2><pre tabindex="0"><code>func isAnagram(s string, t string) bool {
+    if len(s) != len(t){
+        return false
+    }
+    appear := map[byte]int{}
+
+    for index := 0 ; index &lt; len(s) ; index += 1{
+        if _,ok := appear[s[index]]; !ok{
+            appear[s[index]] = 0
+        }
+        appear[s[index]] += 1
+    }
+    for index:=0 ; index &lt; len(t) ; index += 1{
+        if value,ok := appear[t[index]]; ok &amp;&amp; value &gt; 0{
+            appear[t[index]] -= 1
         }else{
-            appear[nums[i]] = true
+            return false
         }
     }
-    return false
+    return true
 }
-</code></pre><p>主要使用了 map 來紀錄出現過的元素。
-關於 map 請參考 <a class="link" href="/post/go-map/" >go-map</a></p>
-
+</code></pre>
 </section>
 
 
