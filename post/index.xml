@@ -6,7 +6,315 @@
         <description>Recent content in Posts on Jack&#39;s Note</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-tw</language>
-        <lastBuildDate>Fri, 09 May 2025 11:28:40 +0800</lastBuildDate><atom:link href="https://example.com/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Fri, 09 May 2025 17:11:07 +0800</lastBuildDate><atom:link href="https://example.com/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Design Pattern Factory</title>
+        <link>https://example.com/post/design-pattern-factory/</link>
+        <pubDate>Fri, 09 May 2025 17:11:07 +0800</pubDate>
+        
+        <guid>https://example.com/post/design-pattern-factory/</guid>
+        <description>&lt;h2 id=&#34;工廠模式&#34;&gt;工廠模式
+&lt;/h2&gt;&lt;p&gt;封裝建立物件的邏輯，讓使用者無須在意物件創建的相關邏輯(e.g. 讀取設定檔&amp;hellip;)。&lt;/p&gt;
+&lt;p&gt;在工廠模式中，會將封裝建立物件邏輯的類別稱為工廠，而實際建立的物件稱為產品，就像普通人並不會知道工廠運作的邏輯，但知道工廠生產什麼產品一樣。
+工廠模式的目的是讓使用者(需要物件的function或邏輯)，無需在意這些物件建立的相關邏輯。&lt;/p&gt;
+&lt;p&gt;以下會以漫畫(comic)作為產品 來舉例說明，假設我有兩種漫畫，分別是 funny 跟 adventure。
+我想要取得漫畫物件最簡單的方法是透過 if 來判斷該創立哪種物件。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;from abc import ABC, abstractmethod
+class Book(ABC):
+    @abstractmethod
+    def content(self) -&amp;gt; str:
+        pass
+    @abstractmethod
+    def cost(self) -&amp;gt; int:
+        pass
+
+class FunnyComics(Book):
+    def content(self) -&amp;gt; str:
+        return &amp;#39;This is funny comic&amp;#39;
+    def cost(self) -&amp;gt; int:
+        return 4
+class AdventureComics(Book):
+    def content(self) -&amp;gt; str:
+        return &amp;#39;This is adventure comic&amp;#39;
+    def cost(self) -&amp;gt; int:
+        return 3
+
+def buy_book(book_type:str) -&amp;gt; Book:
+    if book_type == &amp;#34;Funny Comic&amp;#34;:
+        book = FunnyComics()
+    elif book_type == &amp;#34;Adventure Comic&amp;#34;:
+        book = AdventureComics()
+    print(book.content())
+    print(book.cost())
+
+if __name__ == &amp;#39;__main__&amp;#39;:
+    buy_book(&amp;#34;Funny Comic&amp;#34;)
+    buy_book(&amp;#34;Adventure Comic&amp;#34;)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;但是會發現當漫畫的種類越來越多的時候，&lt;code&gt;buy_book&lt;/code&gt; 內的邏輯會越來越多，並且會一直需要改動 &lt;code&gt;buy_book&lt;/code&gt; 這個 &lt;code&gt;function&lt;/code&gt;。&lt;/p&gt;
+&lt;h3 id=&#34;簡單工廠&#34;&gt;簡單工廠
+&lt;/h3&gt;&lt;p&gt;所有的產品物件類別都由一個共同的工廠類別或介面來管理。&lt;/p&gt;
+&lt;p&gt;其實是將 if 等相關判斷式另外包進去一個類別做管理&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;class SimpleBookFactory():
+    def create_book(self,book_type:str) -&amp;gt; Book:
+        if book_type == &amp;#34;Funny Comic&amp;#34;:
+            book = FunnyComics()
+        elif book_type == &amp;#34;Adventure Comic&amp;#34;:
+            book = AdventureComics()
+        return book
+
+def buy_book(book_type:str):
+    book_factory = SimpleBookFactory()
+    book = book_factory.create_book(book_type)
+    print(book.content())
+    print(book.cost())
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;這樣做的好處在於對於 &lt;code&gt;buy_book&lt;/code&gt; 來說，不用在意 &lt;code&gt;FunnyComics&lt;/code&gt; 跟 &lt;code&gt;AdventureComics&lt;/code&gt; 這兩個類別的實作細節。&lt;/p&gt;
+&lt;p&gt;只需透過傳遞參數給 &lt;code&gt;SimpleBookFactory&lt;/code&gt; 即可。&lt;/p&gt;
+&lt;p&gt;但是這樣做依然有當新增類別時需要修改到 &lt;code&gt;SimpleBookFactory&lt;/code&gt; 這個問題。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;from abc import ABC, abstractmethod
+class Book(ABC):
+    @abstractmethod
+    def content(self) -&amp;gt; str:
+        pass
+    @abstractmethod
+    def cost(self) -&amp;gt; int:
+        pass
+
+class FunnyComics(Book):
+    def content(self) -&amp;gt; str:
+        return &amp;#39;This is funny comic&amp;#39;
+    def cost(self) -&amp;gt; int:
+        return 4
+class AdventureComics(Book):
+    def content(self) -&amp;gt; str:
+        return &amp;#39;This is adventure comic&amp;#39;
+    def cost(self) -&amp;gt; int:
+        return 3
+
+class SimpleBookFactory():
+    def create_book(self,book_type:str)-&amp;gt; Book:
+        if book_type == &amp;#34;Funny Comic&amp;#34;:
+            book = FunnyComics()
+        elif book_type == &amp;#34;Adventure Comic&amp;#34;:
+            book = AdventureComics()
+        return book
+    
+def buy_book(book_type:str):
+    book_factory = SimpleBookFactory()
+    book = book_factory.create_book(book_type)
+    print(book.content())
+    print(book.cost())
+
+if __name__ == &amp;#39;__main__&amp;#39;:
+    buy_book(&amp;#39;Funny Comic&amp;#39;)
+    buy_book(&amp;#39;Adventure Comic&amp;#39;)
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;工廠方法&#34;&gt;工廠方法
+&lt;/h3&gt;&lt;p&gt;設計工廠介面，產生產品物件由根據工廠介面建立的子類別來管理。&lt;/p&gt;
+&lt;p&gt;首先先來將簡單工廠的設計轉為工廠模式的設計。&lt;/p&gt;
+&lt;p&gt;先定義一個工廠類別的介面，並且都應該返回一個產品類別的物件。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;class BookFactory(ABC):
+    @abstractmethod
+    def create_book(self) -&amp;gt; Book:
+        pass
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;根據這個介面，來修改原本的 &lt;code&gt;buy_book&lt;/code&gt;，對於 &lt;code&gt;buy_book&lt;/code&gt; 來說，只需知道傳遞進來的參數是 &lt;code&gt;BookFactory&lt;/code&gt; 類別即可。&lt;/p&gt;
+&lt;p&gt;所以除非是更改到了 &lt;code&gt;BookFactory&lt;/code&gt; 這個介面，否則不會因為新增了工廠或是產品類別而需要更改到 &lt;code&gt;buy_book&lt;/code&gt;。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;def buy_book(factory:BookFactory):
+    book_factory = factory()
+    book = book_factory.create_book()
+    print(book.content())
+    print(book.cost())
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;接著設計工廠類別&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;class FunnyBookFactory(BookFactory):
+    def create_book(self)-&amp;gt; Book:
+        return FunnyComics()
+
+class AdventureBookFactory(BookFactory):
+    def create_book(self)-&amp;gt; Book:
+        return AdventureComics()
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;相對於簡單工場類別，假設我今天需要新增一個新的 &lt;code&gt;Book&lt;/code&gt; 類型，我只須新增一個工廠類別與產品類別就可以。&lt;/p&gt;
+&lt;p&gt;不必擔心新增了 &lt;code&gt;Book&lt;/code&gt; 類型需要去改動到原本的工廠類別，不像簡單工場新增一個產品就需要更改到  &lt;code&gt;SimpleBookFactory&lt;/code&gt; 類別。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;buy_book&lt;/code&gt; 一樣不用在意如何去建立產品物件，因為這些都由各自對應的工廠負責。&lt;/p&gt;
+&lt;p&gt;e.g. 假設要新增一個 love comic，只需新增如下&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;class LoveComics(Book):
+    def content(self) -&amp;gt; str:
+        return &amp;#39;This is love comic&amp;#39;
+    def cost(self) -&amp;gt; int:
+        return 6
+
+class LoveComicsFactory(BookFactory):
+    def create_book(self)-&amp;gt; Book:
+        return LoveComics()
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;不會更改到 &lt;code&gt;buy_book&lt;/code&gt;，甚至先前建立的 &lt;code&gt;FunnyComicsFactory&lt;/code&gt; 或是 &lt;code&gt;AdventureComicsFactory&lt;/code&gt; 類別。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;from abc import ABC, abstractmethod
+class Book(ABC):
+    @abstractmethod
+    def content(self) -&amp;gt; str:
+        pass
+    @abstractmethod
+    def cost(self) -&amp;gt; int:
+        pass
+
+class FunnyComics(Book):
+    def content(self) -&amp;gt; str:
+        return &amp;#39;This is funny comic&amp;#39;
+    def cost(self) -&amp;gt; int:
+        return 4
+    
+class AdventureComics(Book):
+    def content(self) -&amp;gt; str:
+        return &amp;#39;This is adventure comic&amp;#39;
+    def cost(self) -&amp;gt; int:
+        return 3
+    
+class LoveComics(Book):
+    def content(self) -&amp;gt; str:
+        return &amp;#39;This is love comic&amp;#39;
+    def cost(self) -&amp;gt; int:
+        return 6
+    
+class BookFactory(ABC):
+    @abstractmethod
+    def create_book(self,book_type:str) -&amp;gt; Book:
+        pass
+
+class FunnyBookFactory(BookFactory):
+    def create_book(self)-&amp;gt; Book:
+        return FunnyComics()
+
+class AdventureBookFactory(BookFactory):
+    def create_book(self)-&amp;gt; Book:
+        return AdventureComics()
+    
+class LoveBookFactory(BookFactory):
+    def create_book(self)-&amp;gt; Book:
+        return LoveComics()
+
+def buy_book(factory:BookFactory):
+    book_factory = factory()
+    book = book_factory.create_book()
+    print(book.content())
+    print(book.cost())
+
+if __name__ == &amp;#39;__main__&amp;#39;:
+    buy_book(FunnyBookFactory)
+
+    buy_book(AdventureBookFactory)
+
+    buy_book(LoveBookFactory)
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;抽象工廠&#34;&gt;抽象工廠
+&lt;/h3&gt;&lt;p&gt;設計工廠介面用於建立一系列相關的產品。&lt;/p&gt;
+&lt;p&gt;假設當類別變多了，例如今天每種書又都分為電子書跟實體書，前面使用的工廠方法所需設計的類別就可能會變很多。&lt;/p&gt;
+&lt;p&gt;這時就可以使用抽象工廠來解決這個問題。&lt;/p&gt;
+&lt;p&gt;先設計抽象類別，每個工廠會分別建立實體書跟電子書。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;class BookFactory(ABC):
+    @abstractmethod
+    def create_book()-&amp;gt; Book:
+        pass
+    @abstractmethod
+    def create_e_book()-&amp;gt; Book:
+        pass
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;擴充電子書產品類別(&lt;code&gt;Book&lt;/code&gt;)&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;class FunnyComicsEBook(Book):
+    def content(self) -&amp;gt; str:
+        return &amp;#39;This is funny comic e-book&amp;#39;
+    def cost(self) -&amp;gt; int:
+        return 3
+class AdventureComicsEBook(Book):
+    def content(self) -&amp;gt; str:
+        return &amp;#39;This is adventure comic e-book&amp;#39;
+    def cost(self) -&amp;gt; int:
+        return 2
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;根據 &lt;code&gt;BookFactory&lt;/code&gt; 設計子類別&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;class FunnyBookFactory(BookFactory):
+    def create_book(self)-&amp;gt; Book:
+        return FunnyComics()
+    def create_e_book(self)-&amp;gt; Book:
+        return FunnyComicsEBook()
+
+class AdventureBookFactory(BookFactory):
+    def create_book(self)-&amp;gt; Book:
+        return AdventureComics()
+    def create_e_book(self)-&amp;gt; Book:
+        return AdventureComicsEBook()
+&lt;/code&gt;&lt;/pre&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;from abc import ABC, abstractmethod
+
+class Book(ABC):
+    @abstractmethod
+    def content(self) -&amp;gt; str:
+        pass
+    @abstractmethod
+    def cost(self) -&amp;gt; int:
+        pass
+
+class FunnyComics(Book):
+    def content(self) -&amp;gt; str:
+        return &amp;#39;This is funny comic&amp;#39;
+    def cost(self) -&amp;gt; int:
+        return 4
+    
+class FunnyComicsEBook(Book):
+    def content(self) -&amp;gt; str:
+        return &amp;#39;This is funny comic e-book&amp;#39;
+    def cost(self) -&amp;gt; int:
+        return 3
+    
+class AdventureComics(Book):
+    def content(self) -&amp;gt; str:
+        return &amp;#39;This is adventure comic&amp;#39;
+    def cost(self) -&amp;gt; int:
+        return 3
+
+class AdventureComicsEBook(Book):
+    def content(self) -&amp;gt; str:
+        return &amp;#39;This is adventure comic e-book&amp;#39;
+    def cost(self) -&amp;gt; int:
+        return 2
+
+class BookFactory(ABC):
+    @abstractmethod
+    def create_book() -&amp;gt; Book:
+        pass
+    @abstractmethod
+    def create_e_book()-&amp;gt; Book:
+        pass
+
+class FunnyBookFactory(BookFactory):
+    def create_book(self)-&amp;gt; Book:
+        return FunnyComics()
+    def create_e_book(self)-&amp;gt; Book:
+        return FunnyComicsEBook()
+
+class AdventureBookFactory(BookFactory):
+    def create_book(self)-&amp;gt; Book:
+        return AdventureComics()
+    def create_e_book(self)-&amp;gt; Book:
+        return AdventureComicsEBook()
+
+def buy_book(factory:BookFactory):
+    book_factory = factory()
+    book = book_factory.create_book()
+    print(book.content())
+    print(book.cost())
+    e_book = book_factory.create_e_book()
+    print(e_book.content())
+    print(e_book.cost())
+
+if __name__ == &amp;#39;__main__&amp;#39;:
+    buy_book(FunnyBookFactory)
+
+    buy_book(AdventureBookFactory)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;相對於工廠方法，抽象工廠其實更注重於產出彼此相關的產品。
+工廠方法則是專門產生一個產品的工廠。&lt;/p&gt;
+&lt;p&gt;雖然不同的抽象工廠可能生產的產品具備相同功能，但它們的具體實作會根據工廠有所不同。&lt;/p&gt;
+&lt;p&gt;例如本篇例子&lt;code&gt;FunnyBookFactory&lt;/code&gt; 跟 &lt;code&gt;AdventureBookFactory&lt;/code&gt; 底下的產品都分成實體書跟電子書。
+但是 &lt;code&gt;content&lt;/code&gt; 會根據是  &lt;code&gt;FunnyBookFactory&lt;/code&gt; 還是 &lt;code&gt;AdventureBookFactory&lt;/code&gt; 而不同。&lt;/p&gt;
+&lt;h2 id=&#34;參考&#34;&gt;參考:
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;深入淺出設計模式&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://skyyen999.gitbooks.io/-study-design-pattern-in-java/content/simpleFactory.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://skyyen999.gitbooks.io/-study-design-pattern-in-java/content/simpleFactory.html&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        <item>
         <title>Design Pattern Strategy</title>
         <link>https://example.com/post/design-pattern-strategy/</link>
         <pubDate>Fri, 09 May 2025 11:28:40 +0800</pubDate>

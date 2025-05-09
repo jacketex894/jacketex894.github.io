@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-tw" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="工廠模式 封裝建立物件的邏輯，讓使用者無須在意物件創建的相關邏輯(e.g. 讀取設定檔&hellip;)。\n在工廠模式中，會將封裝建立物件邏輯的類別稱為工廠，而實際建立的物件稱為產品，就像普通人並不會知道工廠運作的邏輯，但知道工廠生產什麼產品一樣。 工廠模式的目的是讓使用者(需要物件的function或邏輯)，無需在意這些物件建立的相關邏輯。\n以下會以漫畫(comic)作為產品 來舉例說明，假設我有兩種漫畫，分別是 funny 跟 adventure。 我想要取得漫畫物件最簡單的方法是透過 if 來判斷該創立哪種物件。\nfrom abc import ABC, abstractmethod class Book(ABC): @abstractmethod def content(self) -&gt; str: pass @abstractmethod def cost(self) -&gt; int: pass class FunnyComics(Book): def content(self) -&gt; str: return &#39;This is funny comic&#39; def cost(self) -&gt; int: return 4 class AdventureComics(Book): def content(self) -&gt; str: return &#39;This is adventure comic&#39; def cost(self) -&gt; int: return 3 def buy_book(book_type:str) -&gt; Book: if book_type == &#34;Funny Comic&#34;: book = FunnyComics() elif book_type == &#34;Adventure Comic&#34;: book = AdventureComics() print(book.content()) print(book.cost()) if __name__ == &#39;__main__&#39;: buy_book(&#34;Funny Comic&#34;) buy_book(&#34;Adventure Comic&#34;) 但是會發現當漫畫的種類越來越多的時候，buy_book 內的邏輯會越來越多，並且會一直需要改動 buy_book 這個 function。\n">
+<title>Design Pattern Factory</title>
+
+<link rel='canonical' href='https://example.com/post/design-pattern-factory/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Design Pattern Factory">
+<meta property='og:description' content="工廠模式 封裝建立物件的邏輯，讓使用者無須在意物件創建的相關邏輯(e.g. 讀取設定檔&hellip;)。\n在工廠模式中，會將封裝建立物件邏輯的類別稱為工廠，而實際建立的物件稱為產品，就像普通人並不會知道工廠運作的邏輯，但知道工廠生產什麼產品一樣。 工廠模式的目的是讓使用者(需要物件的function或邏輯)，無需在意這些物件建立的相關邏輯。\n以下會以漫畫(comic)作為產品 來舉例說明，假設我有兩種漫畫，分別是 funny 跟 adventure。 我想要取得漫畫物件最簡單的方法是透過 if 來判斷該創立哪種物件。\nfrom abc import ABC, abstractmethod class Book(ABC): @abstractmethod def content(self) -&gt; str: pass @abstractmethod def cost(self) -&gt; int: pass class FunnyComics(Book): def content(self) -&gt; str: return &#39;This is funny comic&#39; def cost(self) -&gt; int: return 4 class AdventureComics(Book): def content(self) -&gt; str: return &#39;This is adventure comic&#39; def cost(self) -&gt; int: return 3 def buy_book(book_type:str) -&gt; Book: if book_type == &#34;Funny Comic&#34;: book = FunnyComics() elif book_type == &#34;Adventure Comic&#34;: book = AdventureComics() print(book.content()) print(book.cost()) if __name__ == &#39;__main__&#39;: buy_book(&#34;Funny Comic&#34;) buy_book(&#34;Adventure Comic&#34;) 但是會發現當漫畫的種類越來越多的時候，buy_book 內的邏輯會越來越多，並且會一直需要改動 buy_book 這個 function。\n">
+<meta property='og:url' content='https://example.com/post/design-pattern-factory/'>
+<meta property='og:site_name' content='Jack&#39;s Note'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-05-09T17:11:07&#43;08:00'/><meta property='article:modified_time' content='2025-05-09T17:11:07&#43;08:00'/>
+<meta name="twitter:title" content="Design Pattern Factory">
+<meta name="twitter:description" content="工廠模式 封裝建立物件的邏輯，讓使用者無須在意物件創建的相關邏輯(e.g. 讀取設定檔&hellip;)。\n在工廠模式中，會將封裝建立物件邏輯的類別稱為工廠，而實際建立的物件稱為產品，就像普通人並不會知道工廠運作的邏輯，但知道工廠生產什麼產品一樣。 工廠模式的目的是讓使用者(需要物件的function或邏輯)，無需在意這些物件建立的相關邏輯。\n以下會以漫畫(comic)作為產品 來舉例說明，假設我有兩種漫畫，分別是 funny 跟 adventure。 我想要取得漫畫物件最簡單的方法是透過 if 來判斷該創立哪種物件。\nfrom abc import ABC, abstractmethod class Book(ABC): @abstractmethod def content(self) -&gt; str: pass @abstractmethod def cost(self) -&gt; int: pass class FunnyComics(Book): def content(self) -&gt; str: return &#39;This is funny comic&#39; def cost(self) -&gt; int: return 4 class AdventureComics(Book): def content(self) -&gt; str: return &#39;This is adventure comic&#39; def cost(self) -&gt; int: return 3 def buy_book(book_type:str) -&gt; Book: if book_type == &#34;Funny Comic&#34;: book = FunnyComics() elif book_type == &#34;Adventure Comic&#34;: book = AdventureComics() print(book.content()) print(book.cost()) if __name__ == &#39;__main__&#39;: buy_book(&#34;Funny Comic&#34;) buy_book(&#34;Adventure Comic&#34;) 但是會發現當漫畫的種類越來越多的時候，buy_book 內的邏輯會越來越多，並且會一直需要改動 buy_book 這個 function。\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切換選單">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu_f509edb42ecc0ebd.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Jack&#39;s Note</a></h1>
+            <h2 class="site-description">Trying to do better</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/jacketex894'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>夜晚模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/design-pattern-factory/">Design Pattern Factory</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">May 09, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    閱讀時間: 4 分鐘
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="工廠模式">工廠模式
+</h2><p>封裝建立物件的邏輯，讓使用者無須在意物件創建的相關邏輯(e.g. 讀取設定檔&hellip;)。</p>
+<p>在工廠模式中，會將封裝建立物件邏輯的類別稱為工廠，而實際建立的物件稱為產品，就像普通人並不會知道工廠運作的邏輯，但知道工廠生產什麼產品一樣。
+工廠模式的目的是讓使用者(需要物件的function或邏輯)，無需在意這些物件建立的相關邏輯。</p>
+<p>以下會以漫畫(comic)作為產品 來舉例說明，假設我有兩種漫畫，分別是 funny 跟 adventure。
+我想要取得漫畫物件最簡單的方法是透過 if 來判斷該創立哪種物件。</p>
+<pre tabindex="0"><code>from abc import ABC, abstractmethod
+class Book(ABC):
+    @abstractmethod
+    def content(self) -&gt; str:
+        pass
+    @abstractmethod
+    def cost(self) -&gt; int:
+        pass
+
+class FunnyComics(Book):
+    def content(self) -&gt; str:
+        return &#39;This is funny comic&#39;
+    def cost(self) -&gt; int:
+        return 4
+class AdventureComics(Book):
+    def content(self) -&gt; str:
+        return &#39;This is adventure comic&#39;
+    def cost(self) -&gt; int:
+        return 3
+
+def buy_book(book_type:str) -&gt; Book:
+    if book_type == &#34;Funny Comic&#34;:
+        book = FunnyComics()
+    elif book_type == &#34;Adventure Comic&#34;:
+        book = AdventureComics()
+    print(book.content())
+    print(book.cost())
+
+if __name__ == &#39;__main__&#39;:
+    buy_book(&#34;Funny Comic&#34;)
+    buy_book(&#34;Adventure Comic&#34;)
+</code></pre><p>但是會發現當漫畫的種類越來越多的時候，<code>buy_book</code> 內的邏輯會越來越多，並且會一直需要改動 <code>buy_book</code> 這個 <code>function</code>。</p>
+<h3 id="簡單工廠">簡單工廠
+</h3><p>所有的產品物件類別都由一個共同的工廠類別或介面來管理。</p>
+<p>其實是將 if 等相關判斷式另外包進去一個類別做管理</p>
+<pre tabindex="0"><code>class SimpleBookFactory():
+    def create_book(self,book_type:str) -&gt; Book:
+        if book_type == &#34;Funny Comic&#34;:
+            book = FunnyComics()
+        elif book_type == &#34;Adventure Comic&#34;:
+            book = AdventureComics()
+        return book
+
+def buy_book(book_type:str):
+    book_factory = SimpleBookFactory()
+    book = book_factory.create_book(book_type)
+    print(book.content())
+    print(book.cost())
+</code></pre><p>這樣做的好處在於對於 <code>buy_book</code> 來說，不用在意 <code>FunnyComics</code> 跟 <code>AdventureComics</code> 這兩個類別的實作細節。</p>
+<p>只需透過傳遞參數給 <code>SimpleBookFactory</code> 即可。</p>
+<p>但是這樣做依然有當新增類別時需要修改到 <code>SimpleBookFactory</code> 這個問題。</p>
+<pre tabindex="0"><code>from abc import ABC, abstractmethod
+class Book(ABC):
+    @abstractmethod
+    def content(self) -&gt; str:
+        pass
+    @abstractmethod
+    def cost(self) -&gt; int:
+        pass
+
+class FunnyComics(Book):
+    def content(self) -&gt; str:
+        return &#39;This is funny comic&#39;
+    def cost(self) -&gt; int:
+        return 4
+class AdventureComics(Book):
+    def content(self) -&gt; str:
+        return &#39;This is adventure comic&#39;
+    def cost(self) -&gt; int:
+        return 3
+
+class SimpleBookFactory():
+    def create_book(self,book_type:str)-&gt; Book:
+        if book_type == &#34;Funny Comic&#34;:
+            book = FunnyComics()
+        elif book_type == &#34;Adventure Comic&#34;:
+            book = AdventureComics()
+        return book
+    
+def buy_book(book_type:str):
+    book_factory = SimpleBookFactory()
+    book = book_factory.create_book(book_type)
+    print(book.content())
+    print(book.cost())
+
+if __name__ == &#39;__main__&#39;:
+    buy_book(&#39;Funny Comic&#39;)
+    buy_book(&#39;Adventure Comic&#39;)
+</code></pre><h3 id="工廠方法">工廠方法
+</h3><p>設計工廠介面，產生產品物件由根據工廠介面建立的子類別來管理。</p>
+<p>首先先來將簡單工廠的設計轉為工廠模式的設計。</p>
+<p>先定義一個工廠類別的介面，並且都應該返回一個產品類別的物件。</p>
+<pre tabindex="0"><code>class BookFactory(ABC):
+    @abstractmethod
+    def create_book(self) -&gt; Book:
+        pass
+</code></pre><p>根據這個介面，來修改原本的 <code>buy_book</code>，對於 <code>buy_book</code> 來說，只需知道傳遞進來的參數是 <code>BookFactory</code> 類別即可。</p>
+<p>所以除非是更改到了 <code>BookFactory</code> 這個介面，否則不會因為新增了工廠或是產品類別而需要更改到 <code>buy_book</code>。</p>
+<pre tabindex="0"><code>def buy_book(factory:BookFactory):
+    book_factory = factory()
+    book = book_factory.create_book()
+    print(book.content())
+    print(book.cost())
+</code></pre><p>接著設計工廠類別</p>
+<pre tabindex="0"><code>class FunnyBookFactory(BookFactory):
+    def create_book(self)-&gt; Book:
+        return FunnyComics()
+
+class AdventureBookFactory(BookFactory):
+    def create_book(self)-&gt; Book:
+        return AdventureComics()
+</code></pre><p>相對於簡單工場類別，假設我今天需要新增一個新的 <code>Book</code> 類型，我只須新增一個工廠類別與產品類別就可以。</p>
+<p>不必擔心新增了 <code>Book</code> 類型需要去改動到原本的工廠類別，不像簡單工場新增一個產品就需要更改到  <code>SimpleBookFactory</code> 類別。</p>
+<p><code>buy_book</code> 一樣不用在意如何去建立產品物件，因為這些都由各自對應的工廠負責。</p>
+<p>e.g. 假設要新增一個 love comic，只需新增如下</p>
+<pre tabindex="0"><code>class LoveComics(Book):
+    def content(self) -&gt; str:
+        return &#39;This is love comic&#39;
+    def cost(self) -&gt; int:
+        return 6
+
+class LoveComicsFactory(BookFactory):
+    def create_book(self)-&gt; Book:
+        return LoveComics()
+</code></pre><p>不會更改到 <code>buy_book</code>，甚至先前建立的 <code>FunnyComicsFactory</code> 或是 <code>AdventureComicsFactory</code> 類別。</p>
+<pre tabindex="0"><code>from abc import ABC, abstractmethod
+class Book(ABC):
+    @abstractmethod
+    def content(self) -&gt; str:
+        pass
+    @abstractmethod
+    def cost(self) -&gt; int:
+        pass
+
+class FunnyComics(Book):
+    def content(self) -&gt; str:
+        return &#39;This is funny comic&#39;
+    def cost(self) -&gt; int:
+        return 4
+    
+class AdventureComics(Book):
+    def content(self) -&gt; str:
+        return &#39;This is adventure comic&#39;
+    def cost(self) -&gt; int:
+        return 3
+    
+class LoveComics(Book):
+    def content(self) -&gt; str:
+        return &#39;This is love comic&#39;
+    def cost(self) -&gt; int:
+        return 6
+    
+class BookFactory(ABC):
+    @abstractmethod
+    def create_book(self,book_type:str) -&gt; Book:
+        pass
+
+class FunnyBookFactory(BookFactory):
+    def create_book(self)-&gt; Book:
+        return FunnyComics()
+
+class AdventureBookFactory(BookFactory):
+    def create_book(self)-&gt; Book:
+        return AdventureComics()
+    
+class LoveBookFactory(BookFactory):
+    def create_book(self)-&gt; Book:
+        return LoveComics()
+
+def buy_book(factory:BookFactory):
+    book_factory = factory()
+    book = book_factory.create_book()
+    print(book.content())
+    print(book.cost())
+
+if __name__ == &#39;__main__&#39;:
+    buy_book(FunnyBookFactory)
+
+    buy_book(AdventureBookFactory)
+
+    buy_book(LoveBookFactory)
+</code></pre><h3 id="抽象工廠">抽象工廠
+</h3><p>設計工廠介面用於建立一系列相關的產品。</p>
+<p>假設當類別變多了，例如今天每種書又都分為電子書跟實體書，前面使用的工廠方法所需設計的類別就可能會變很多。</p>
+<p>這時就可以使用抽象工廠來解決這個問題。</p>
+<p>先設計抽象類別，每個工廠會分別建立實體書跟電子書。</p>
+<pre tabindex="0"><code>class BookFactory(ABC):
+    @abstractmethod
+    def create_book()-&gt; Book:
+        pass
+    @abstractmethod
+    def create_e_book()-&gt; Book:
+        pass
+</code></pre><p>擴充電子書產品類別(<code>Book</code>)</p>
+<pre tabindex="0"><code>class FunnyComicsEBook(Book):
+    def content(self) -&gt; str:
+        return &#39;This is funny comic e-book&#39;
+    def cost(self) -&gt; int:
+        return 3
+class AdventureComicsEBook(Book):
+    def content(self) -&gt; str:
+        return &#39;This is adventure comic e-book&#39;
+    def cost(self) -&gt; int:
+        return 2
+</code></pre><p>根據 <code>BookFactory</code> 設計子類別</p>
+<pre tabindex="0"><code>class FunnyBookFactory(BookFactory):
+    def create_book(self)-&gt; Book:
+        return FunnyComics()
+    def create_e_book(self)-&gt; Book:
+        return FunnyComicsEBook()
+
+class AdventureBookFactory(BookFactory):
+    def create_book(self)-&gt; Book:
+        return AdventureComics()
+    def create_e_book(self)-&gt; Book:
+        return AdventureComicsEBook()
+</code></pre><pre tabindex="0"><code>from abc import ABC, abstractmethod
+
+class Book(ABC):
+    @abstractmethod
+    def content(self) -&gt; str:
+        pass
+    @abstractmethod
+    def cost(self) -&gt; int:
+        pass
+
+class FunnyComics(Book):
+    def content(self) -&gt; str:
+        return &#39;This is funny comic&#39;
+    def cost(self) -&gt; int:
+        return 4
+    
+class FunnyComicsEBook(Book):
+    def content(self) -&gt; str:
+        return &#39;This is funny comic e-book&#39;
+    def cost(self) -&gt; int:
+        return 3
+    
+class AdventureComics(Book):
+    def content(self) -&gt; str:
+        return &#39;This is adventure comic&#39;
+    def cost(self) -&gt; int:
+        return 3
+
+class AdventureComicsEBook(Book):
+    def content(self) -&gt; str:
+        return &#39;This is adventure comic e-book&#39;
+    def cost(self) -&gt; int:
+        return 2
+
+class BookFactory(ABC):
+    @abstractmethod
+    def create_book() -&gt; Book:
+        pass
+    @abstractmethod
+    def create_e_book()-&gt; Book:
+        pass
+
+class FunnyBookFactory(BookFactory):
+    def create_book(self)-&gt; Book:
+        return FunnyComics()
+    def create_e_book(self)-&gt; Book:
+        return FunnyComicsEBook()
+
+class AdventureBookFactory(BookFactory):
+    def create_book(self)-&gt; Book:
+        return AdventureComics()
+    def create_e_book(self)-&gt; Book:
+        return AdventureComicsEBook()
+
+def buy_book(factory:BookFactory):
+    book_factory = factory()
+    book = book_factory.create_book()
+    print(book.content())
+    print(book.cost())
+    e_book = book_factory.create_e_book()
+    print(e_book.content())
+    print(e_book.cost())
+
+if __name__ == &#39;__main__&#39;:
+    buy_book(FunnyBookFactory)
+
+    buy_book(AdventureBookFactory)
+</code></pre><p>相對於工廠方法，抽象工廠其實更注重於產出彼此相關的產品。
+工廠方法則是專門產生一個產品的工廠。</p>
+<p>雖然不同的抽象工廠可能生產的產品具備相同功能，但它們的具體實作會根據工廠有所不同。</p>
+<p>例如本篇例子<code>FunnyBookFactory</code> 跟 <code>AdventureBookFactory</code> 底下的產品都分成實體書跟電子書。
+但是 <code>content</code> 會根據是  <code>FunnyBookFactory</code> 還是 <code>AdventureBookFactory</code> 而不同。</p>
+<h2 id="參考">參考:
+</h2><ul>
+<li>深入淺出設計模式</li>
+<li><a class="link" href="https://skyyen999.gitbooks.io/-study-design-pattern-in-java/content/simpleFactory.html"  target="_blank" rel="noopener"
+    >https://skyyen999.gitbooks.io/-study-design-pattern-in-java/content/simpleFactory.html</a></li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2025 Jack&#39;s Note
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 建立 <br />
+        主題 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 設計
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
