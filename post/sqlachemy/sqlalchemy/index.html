@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-tw" dir="ltr">
-    <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="題目 347. Top K Frequent Elements\n給予一個數字陣列 nums 跟數字 k ，回傳這個數字陣列中出現的數字頻率前 K 多的數字。 題目有保證 answer 是 unique ， 所以我認為不用考慮到頻率有相等，但剛好在第 K 跟第 K + 1 的狀況。\nPseudocode 初始化一個 frequency map 用來記錄元素出現頻率 從第 0 個元素開始遍歷 nums: 如果元素沒有出現過: 將元素作為 key 在 frequency 中對應 0 將 frequency 中的元素對應的 value + 1，紀錄出現頻率 + 1 根據 frequency 內的 value 去排序對應的 key 出現頻率的多寡 將排序結果中前 K 大的 key 回傳 時間複雜度會根據排序的演算法而有不同，如果是 Python 的 sorted 或 go 的 sort是O(n log n)\n">
-<title>Leetcode 347</title>
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="前言 學到了 connection pool，想說要來 optimize 自己的 side project。 沒想到研究了半天，原本使用的 Sqlalchemy 就已經有內建有做了。 因此做個筆記紀錄一下，也給自己一個警惕，比起請 AI 直接開始改寫，不如先去讀一下官方文件，養成閱讀官方文件的習慣。 在使用 AI 上也要更小心自己不夠了解的部分，避免被幻覺誤導。\nConnection pool 每當跟資料庫要求 CRUD 操作時，都需要跟資料庫建立連線、進行操作、關閉連線。 建立連線跟關閉連線的動作對資料庫來說是很消耗資源的，connection pool 就是為了解決消耗資源的問題。 connection pool 相當於連線的快取，程式會事先建立固定的連線數量，當要跟資料庫要求執行操作時，會從 connection pool 中取得已事先建立好的連線，完成操作後再歸還。 透過重複使用已建立的連線，來減少每次操作都建立連線再關閉連線所消耗的資源。\n以下會先事先建立好資料庫，用於比較有 connection pool 跟沒有 connection pool 查詢的差異。\nmysql.connector mysql.connector 是由 MySQL 官方提供的 lib。 會先利用此 lib 的方法來連接資料庫做查詢。\nmysql.connector 的使用方法\n透過 mysql.connector.connect 來設定基本設定以及建立連線，這裡不設定 port 是因為在測試範例中使用的是 mysql 的 default port 3306。 透過 connection.cursor() 建立 cursor，透過 cursor 跟 DB 溝通(傳遞 SQL 指令跟取回結果)。 without_pool 每次查詢都會建立連線查詢，再關閉連線。\n">
+<title>Sqlalchemy</title>
 
-<link rel='canonical' href='https://example.com/post/leetcode-347/'>
+<link rel='canonical' href='http://localhost:1313/post/sqlachemy/sqlalchemy/'>
 
-<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Leetcode 347">
-<meta property='og:description' content="題目 347. Top K Frequent Elements\n給予一個數字陣列 nums 跟數字 k ，回傳這個數字陣列中出現的數字頻率前 K 多的數字。 題目有保證 answer 是 unique ， 所以我認為不用考慮到頻率有相等，但剛好在第 K 跟第 K + 1 的狀況。\nPseudocode 初始化一個 frequency map 用來記錄元素出現頻率 從第 0 個元素開始遍歷 nums: 如果元素沒有出現過: 將元素作為 key 在 frequency 中對應 0 將 frequency 中的元素對應的 value + 1，紀錄出現頻率 + 1 根據 frequency 內的 value 去排序對應的 key 出現頻率的多寡 將排序結果中前 K 大的 key 回傳 時間複雜度會根據排序的演算法而有不同，如果是 Python 的 sorted 或 go 的 sort是O(n log n)\n">
-<meta property='og:url' content='https://example.com/post/leetcode-347/'>
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Sqlalchemy">
+<meta property='og:description' content="前言 學到了 connection pool，想說要來 optimize 自己的 side project。 沒想到研究了半天，原本使用的 Sqlalchemy 就已經有內建有做了。 因此做個筆記紀錄一下，也給自己一個警惕，比起請 AI 直接開始改寫，不如先去讀一下官方文件，養成閱讀官方文件的習慣。 在使用 AI 上也要更小心自己不夠了解的部分，避免被幻覺誤導。\nConnection pool 每當跟資料庫要求 CRUD 操作時，都需要跟資料庫建立連線、進行操作、關閉連線。 建立連線跟關閉連線的動作對資料庫來說是很消耗資源的，connection pool 就是為了解決消耗資源的問題。 connection pool 相當於連線的快取，程式會事先建立固定的連線數量，當要跟資料庫要求執行操作時，會從 connection pool 中取得已事先建立好的連線，完成操作後再歸還。 透過重複使用已建立的連線，來減少每次操作都建立連線再關閉連線所消耗的資源。\n以下會先事先建立好資料庫，用於比較有 connection pool 跟沒有 connection pool 查詢的差異。\nmysql.connector mysql.connector 是由 MySQL 官方提供的 lib。 會先利用此 lib 的方法來連接資料庫做查詢。\nmysql.connector 的使用方法\n透過 mysql.connector.connect 來設定基本設定以及建立連線，這裡不設定 port 是因為在測試範例中使用的是 mysql 的 default port 3306。 透過 connection.cursor() 建立 cursor，透過 cursor 跟 DB 溝通(傳遞 SQL 指令跟取回結果)。 without_pool 每次查詢都會建立連線查詢，再關閉連線。\n">
+<meta property='og:url' content='http://localhost:1313/post/sqlachemy/sqlalchemy/'>
 <meta property='og:site_name' content='Jack&#39;s Note'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-05-06T21:07:33&#43;08:00'/><meta property='article:modified_time' content='2025-05-06T21:07:33&#43;08:00'/>
-<meta name="twitter:title" content="Leetcode 347">
-<meta name="twitter:description" content="題目 347. Top K Frequent Elements\n給予一個數字陣列 nums 跟數字 k ，回傳這個數字陣列中出現的數字頻率前 K 多的數字。 題目有保證 answer 是 unique ， 所以我認為不用考慮到頻率有相等，但剛好在第 K 跟第 K + 1 的狀況。\nPseudocode 初始化一個 frequency map 用來記錄元素出現頻率 從第 0 個元素開始遍歷 nums: 如果元素沒有出現過: 將元素作為 key 在 frequency 中對應 0 將 frequency 中的元素對應的 value + 1，紀錄出現頻率 + 1 根據 frequency 內的 value 去排序對應的 key 出現頻率的多寡 將排序結果中前 K 大的 key 回傳 時間複雜度會根據排序的演算法而有不同，如果是 Python 的 sorted 或 go 的 sort是O(n log n)\n">
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-05-13T00:23:14&#43;08:00'/><meta property='article:modified_time' content='2025-05-13T00:23:14&#43;08:00'/>
+<meta name="twitter:title" content="Sqlalchemy">
+<meta name="twitter:description" content="前言 學到了 connection pool，想說要來 optimize 自己的 side project。 沒想到研究了半天，原本使用的 Sqlalchemy 就已經有內建有做了。 因此做個筆記紀錄一下，也給自己一個警惕，比起請 AI 直接開始改寫，不如先去讀一下官方文件，養成閱讀官方文件的習慣。 在使用 AI 上也要更小心自己不夠了解的部分，避免被幻覺誤導。\nConnection pool 每當跟資料庫要求 CRUD 操作時，都需要跟資料庫建立連線、進行操作、關閉連線。 建立連線跟關閉連線的動作對資料庫來說是很消耗資源的，connection pool 就是為了解決消耗資源的問題。 connection pool 相當於連線的快取，程式會事先建立固定的連線數量，當要跟資料庫要求執行操作時，會從 connection pool 中取得已事先建立好的連線，完成操作後再歸還。 透過重複使用已建立的連線，來減少每次操作都建立連線再關閉連線所消耗的資源。\n以下會先事先建立好資料庫，用於比較有 connection pool 跟沒有 connection pool 查詢的差異。\nmysql.connector mysql.connector 是由 MySQL 官方提供的 lib。 會先利用此 lib 的方法來連接資料庫做查詢。\nmysql.connector 的使用方法\n透過 mysql.connector.connect 來設定基本設定以及建立連線，這裡不設定 port 是因為在測試範例中使用的是 mysql 的 default port 3306。 透過 connection.cursor() 建立 cursor，透過 cursor 跟 DB 溝通(傳遞 SQL 指令跟取回結果)。 without_pool 每次查詢都會建立連線查詢，再關閉連線。\n">
     </head>
     <body class="
     article-page
@@ -155,7 +155,7 @@
 
     <div class="article-title-wrapper">
         <h2 class="article-title">
-            <a href="/post/leetcode-347/">Leetcode 347</a>
+            <a href="/post/sqlachemy/sqlalchemy/">Sqlalchemy</a>
         </h2>
     
         
@@ -177,7 +177,7 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published">May 06, 2025</time>
+                <time class="article-time--published">May 13, 2025</time>
             </div>
         
 
@@ -207,56 +207,77 @@
     <section class="article-content">
     
     
-    <h2 id="題目">題目
-</h2><p><a class="link" href="https://leetcode.com/problems/top-k-frequent-elements"  target="_blank" rel="noopener"
-    >347. Top K Frequent Elements</a></p>
-<p>給予一個數字陣列 nums 跟數字 k ，回傳這個數字陣列中出現的數字頻率前 K 多的數字。
-題目有保證 answer 是 unique ， 所以我認為不用考慮到頻率有相等，但剛好在第 K 跟第 K + 1 的狀況。</p>
-<h2 id="pseudocode">Pseudocode
-</h2><pre tabindex="0"><code>初始化一個 frequency map 用來記錄元素出現頻率
-從第 0 個元素開始遍歷 nums:
-    如果元素沒有出現過:
-        將元素作為 key 在 frequency 中對應 0
-    將 frequency 中的元素對應的 value + 1，紀錄出現頻率 + 1 
-根據 frequency 內的 value 去排序對應的 key 出現頻率的多寡
-將排序結果中前 K 大的 key 回傳
-</code></pre><p>時間複雜度會根據排序的演算法而有不同，如果是 Python 的 sorted 或 go 的 sort是O(n log n)</p>
-<h2 id="python">Python
-</h2><pre tabindex="0"><code>class Solution:
-    def topKFrequent(self, nums: List[int], k: int) -&gt; List[int]:
-        frequency = {}
-        for num in nums:
-            if num not in frequency:
-                frequency[num] = 0
-            frequency[num] += 1
-        
-        answer = sorted(frequency.keys(),key = lambda x: frequency[x],reverse=True)
-        return answer[:k]
-</code></pre><h3 id="go">Go
-</h3><pre tabindex="0"><code>import (
-    &#34;fmt&#34;
-    &#34;sort&#34;
-)
+    <h2 id="前言">前言
+</h2><p>學到了 connection pool，想說要來 optimize 自己的 side project。
+沒想到研究了半天，原本使用的 Sqlalchemy 就已經有內建有做了。
+因此做個筆記紀錄一下，也給自己一個警惕，比起請 AI 直接開始改寫，不如先去讀一下官方文件，養成閱讀官方文件的習慣。
+在使用 AI 上也要更小心自己不夠了解的部分，避免被幻覺誤導。</p>
+<h2 id="connection-pool">Connection pool
+</h2><p>每當跟資料庫要求 CRUD 操作時，都需要跟資料庫建立連線、進行操作、關閉連線。
+建立連線跟關閉連線的動作對資料庫來說是很消耗資源的，connection pool 就是為了解決消耗資源的問題。
+connection pool 相當於連線的快取，程式會事先建立固定的連線數量，當要跟資料庫要求執行操作時，會從 connection pool 中取得已事先建立好的連線，完成操作後再歸還。
+透過重複使用已建立的連線，來減少每次操作都建立連線再關閉連線所消耗的資源。</p>
+<p>以下會先事先建立好資料庫，用於比較有 connection pool 跟沒有 connection pool
+查詢的差異。</p>
+<h2 id="mysqlconnector">mysql.connector
+</h2><p>mysql.connector 是由 MySQL 官方提供的 lib。
+會先利用此 lib 的方法來連接資料庫做查詢。</p>
+<p>mysql.connector 的使用方法</p>
+<ul>
+<li>透過 mysql.connector.connect 來設定基本設定以及建立連線，這裡不設定 port 是因為在測試範例中使用的是 mysql 的 default port 3306。</li>
+<li>透過 connection.cursor() 建立 cursor，透過 cursor 跟 DB 溝通(傳遞 SQL 指令跟取回結果)。</li>
+</ul>
+<h3 id="without_pool">without_pool
+</h3><p>每次查詢都會建立連線查詢，再關閉連線。</p>
+<pre tabindex="0"><code>def query_with_out_pool():
+    connection = None
+    cursor = None
+    try:
+        connection = mysql.connector.connect(
+            host=DB_HOST,
+            user=DB_USER,
+            passwd=DB_PASSWORD,
+            database=DB_NAME
+        )
+        if connection.is_connected():
+            cursor = connection.cursor()
+            query = f&#34;&#34;&#34;SELECT name 
+            FROM {TABLE_NAME}
+            WHERE name = &#39;test_55&#39;&#34;&#34;&#34;
+            cursor.execute(query)
+            records = cursor.fetchall()
+    except Error as e:
+        print(f&#34;Database operation error{e}&#34;)
+    finally:
+        if connection and connection.is_connected():
+            if cursor:
+                cursor.close()
+            connection.close()
+</code></pre><p>我使用 line_profile 來逐行檢視執行100次所消耗的資源。</p>
+<p><img src="/query_with_pool.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="query_with_pool"
+	
+	
+></p>
+<h2 id="reference">Reference
+</h2><p><a class="link" href="https://en.wikipedia.org/wiki/Connection_pool"  target="_blank" rel="noopener"
+    >https://en.wikipedia.org/wiki/Connection_pool</a>
+<a class="link" href="https://vocus.cc/article/5f800406fd89780001365d17"  target="_blank" rel="noopener"
+    >https://vocus.cc/article/5f800406fd89780001365d17</a>
+<a class="link" href="https://dev.mysql.com/doc/connector-python/en/connector-python-example-cursor-select.html"  target="_blank" rel="noopener"
+    >https://dev.mysql.com/doc/connector-python/en/connector-python-example-cursor-select.html</a>
+<a class="link" href="https://www.runoob.com/python3/python-mysql-connector.html"  target="_blank" rel="noopener"
+    >https://www.runoob.com/python3/python-mysql-connector.html</a>
+<a class="link" href="https://dev.mysql.com/doc/connector-python/en/connector-python-connection-pooling.html"  target="_blank" rel="noopener"
+    >https://dev.mysql.com/doc/connector-python/en/connector-python-connection-pooling.html</a>
+<a class="link" href="https://github.com/pyutils/line_profiler"  target="_blank" rel="noopener"
+    >https://github.com/pyutils/line_profiler</a></p>
 
-func topKFrequent(nums []int, k int) []int {
-    frequency :=  map[int]int{}
-    for index:=0;index &lt; len(nums);index += 1{
-        if _,ok := frequency[nums[index]]; !ok{
-            frequency[nums[index]] = 0
-        }
-        frequency[nums[index]] += 1
-    }
-    answer := []int{}
-    for number := range frequency{
-        answer = append(answer,number)
-    }
-
-    sort.Slice(answer,func(i,j int) bool{
-        return frequency[answer[i]] &gt; frequency[answer[j]]
-    })
-    return answer[:k]
-}
-</code></pre>
 </section>
 
 
@@ -376,7 +397,7 @@ func topKFrequent(nums []int, k int) []int {
                 src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
                 
                 >
-            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+            </script><script type="text/javascript" src="/ts/main.f7cd3f38cb3a232f30afc63001c7b35016dd7ce84029d841eef37b1873c1c01a.js" defer></script>
 <script>
     (function () {
         const customFont = document.createElement('link');
