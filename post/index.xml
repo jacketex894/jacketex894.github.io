@@ -179,6 +179,7 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
 &lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;sqlalchemy&#34;&gt;sqlalchemy
 &lt;/h2&gt;&lt;p&gt;sqlalchemy 是一個 ORM (Object Relational Mapper) library，讓使用者透過物件導向的方式去編寫程式碼，ORM 會再轉譯成 SQL 指令去執行。&lt;/p&gt;
 &lt;p&gt;ORM 可以防止 SQL 注入攻擊，但由於轉譯的關係，使用 ORM 也會比原生的 SQL 速度要更慢。&lt;/p&gt;
+&lt;p&gt;sqlalchemy default 就有 connection pool。&lt;/p&gt;
 &lt;p&gt;以下是一個簡單的 sqlalchemy 範例&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;from sqlalchemy import Column, Integer, String,create_engine
 from sqlalchemy.orm import declarative_base
@@ -212,6 +213,7 @@ def query_with_pool_sqlalchemy() -&amp;gt; User|None:
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;sqlalchemy 在使用 pool 的方式比較不同，並非是預先建立好連線。&lt;/p&gt;
 &lt;p&gt;而是首次使用的時候才建立連線，而 session.close 則是將資源歸還給 pool，並非關閉連線。&lt;/p&gt;
 &lt;p&gt;可以發現使用 sqlalchemy 的時間與 mysql.connector 使用 pool 的時間接近，但稍慢一點，這部分的差異可能就是在於轉譯 SQL 指令所花費的時間。&lt;/p&gt;
+&lt;p&gt;可以發現 63.3% 的時間都在 query_uesr 設定 fliter 條件去搜尋這段。&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;Wrote profile results to query.py.lprof
 Timer unit: 1e-06 s
 
@@ -238,7 +240,17 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
     85                                           def test():
     86       101         29.0      0.3      0.0      for i in range(0,100):
     87       100     231308.2   2313.1    100.0          query_with_pool_sqlalchemy()
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;reference&#34;&gt;Reference
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;sqlalchemy 雖然在預設就有使用 pool，但也有提供使用者自行設定 pool 的參數。
+* pool_size    : pool 內有多少連線需要保持
+* max_overflow : 設定 pool 中最多可以有多少連線
+* pool_recycle : 設定多少秒後回收連線
+* pool_timeout : 設定多少秒後放棄從 pool 中取得連線
+max_overflow 的用意是當連線都在被使用的時候，最多可以多開到多少連線。
+以下是使用例子，作為 &lt;code&gt;create_engine&lt;/code&gt; 的參數傳入即可。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;engine = create_engine(f&amp;#34;mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{3306}/{DB_NAME},pool_size=5, max_overflow=10&amp;#34;)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;更詳細的使用設定可以參考&lt;a class=&#34;link&#34; href=&#34;https://docs.sqlalchemy.org/en/20/core/engines.html#sqlalchemy.create_engine&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;官方文件&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;reference&#34;&gt;Reference
 &lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://en.wikipedia.org/wiki/Connection_pool&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;https://en.wikipedia.org/wiki/Connection_pool&lt;/a&gt;
 &lt;a class=&#34;link&#34; href=&#34;https://vocus.cc/article/5f800406fd89780001365d17&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
@@ -256,7 +268,9 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
 &lt;a class=&#34;link&#34; href=&#34;https://www.explainthis.io/zh-hant/swe/orm-intro&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;https://www.explainthis.io/zh-hant/swe/orm-intro&lt;/a&gt;
 &lt;a class=&#34;link&#34; href=&#34;https://docs.sqlalchemy.org/en/20/core/pooling.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;https://docs.sqlalchemy.org/en/20/core/pooling.html&lt;/a&gt;&lt;/p&gt;
+    &gt;https://docs.sqlalchemy.org/en/20/core/pooling.html&lt;/a&gt;
+&lt;a class=&#34;link&#34; href=&#34;https://docs.sqlalchemy.org/en/20/core/engines.html#sqlalchemy.create_engine&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://docs.sqlalchemy.org/en/20/core/engines.html#sqlalchemy.create_engine&lt;/a&gt;&lt;/p&gt;
 </description>
         </item>
         <item>
