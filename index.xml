@@ -6,7 +6,182 @@
         <description>Recent content on Jack&#39;s Note</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-tw</language>
-        <lastBuildDate>Tue, 13 May 2025 00:23:14 +0800</lastBuildDate><atom:link href="https://example.com/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Thu, 22 May 2025 11:17:31 +0800</lastBuildDate><atom:link href="https://example.com/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>SQL vs NoSQL</title>
+        <link>https://example.com/post/sql-vs-nosql/</link>
+        <pubDate>Thu, 22 May 2025 11:17:31 +0800</pubDate>
+        
+        <guid>https://example.com/post/sql-vs-nosql/</guid>
+        <description>&lt;h2 id=&#34;sql-structured-query-language&#34;&gt;SQL (Structured Query Language)
+&lt;/h2&gt;&lt;p&gt;SQL 是指一種查詢語言，用來跟關聯式資料庫(RDBMS,Relational Database Management System)互動。&lt;/p&gt;
+&lt;h3 id=&#34;rdbms-relational-database-management-system&#34;&gt;RDBMS (Relational Database Management System)
+&lt;/h3&gt;&lt;p&gt;使用 Table 來儲存管理資料，Table 中會以表格的方式儲存資料，如下所示。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;user_id&lt;/th&gt;
+          &lt;th&gt;user_name&lt;/th&gt;
+          &lt;th&gt;email&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;0&lt;/td&gt;
+          &lt;td&gt;Jack&lt;/td&gt;
+          &lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;mailto:example@test.com&#34; &gt;example@test.com&lt;/a&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;同一欄位的資料，會規定是要相同的資料型態。&lt;/p&gt;
+&lt;p&gt;每個表格會有一個 Primary Key，用來唯一識別每條資料。&lt;/p&gt;
+&lt;p&gt;表格跟表格之間可以建立關聯(join)，表示表格可以特過特定的欄位資料來跟另一個表格相互關聯。&lt;/p&gt;
+&lt;p&gt;以以下兩張表來做說明&lt;/p&gt;
+&lt;p&gt;users&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;user_id&lt;/th&gt;
+          &lt;th&gt;user_name&lt;/th&gt;
+          &lt;th&gt;email&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;0&lt;/td&gt;
+          &lt;td&gt;Jack&lt;/td&gt;
+          &lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;mailto:example@test.com&#34; &gt;example@test.com&lt;/a&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;user_detail&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;user_name&lt;/th&gt;
+          &lt;th&gt;Age&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Jack&lt;/td&gt;
+          &lt;td&gt;28&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;假如想要查詢使用者姓名、電子郵件、年齡，可以透過 SQL 語法關聯。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;SELECT users.user_name, users.email, user_details.Age
+FROM users
+INNER JOIN user_details
+ON users.user_name = user_details.user_name;
+&lt;/code&gt;&lt;/pre&gt;&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;user_id&lt;/th&gt;
+          &lt;th&gt;user_name&lt;/th&gt;
+          &lt;th&gt;email&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;0&lt;/td&gt;
+          &lt;td&gt;Jack&lt;/td&gt;
+          &lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;mailto:example@test.com&#34; &gt;example@test.com&lt;/a&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;RDBMS 具備 ACID 特性，在資料庫中，使用一筆交易(transaction)來指一組資料庫操作，以下以交易來解釋 ACID。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;原子性(Atomicity):一筆交易中只要有任何操作失敗，就必須回滾(roll back)為交易前的狀態。&lt;/li&gt;
+&lt;li&gt;一致性(Consistency):交易前後，資料庫必須保持一致的狀態，交易不會破壞資料庫的完整系。e.g. A 與 B 一共有 200 元，A 轉帳給 B，轉完帳後 A 與 B 依然一共有 200 元。&lt;/li&gt;
+&lt;li&gt;隔離性(Isolation):交易之間不會互相干擾。每個交易的執行不應該被其他交易影響，isolation 可以再分為四個級別。&lt;/li&gt;
+&lt;li&gt;持久性(Durability):只要資料寫入資料庫，即便是系統崩潰也不會丟失。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;index&#34;&gt;index
+&lt;/h3&gt;&lt;p&gt;RDBMS 透過 B-Tree 資料結構來建立索引，並且可以依照排序來儲存索引。&lt;/p&gt;
+&lt;h2 id=&#34;nosqlnot-only-sql&#34;&gt;NoSQL(Not only sql)
+&lt;/h2&gt;&lt;p&gt;NoSQL 通常指的是不使用表格關聯方式來儲存資料的資料庫，儲存方式多元，以我自己常用的 mongodb 來講，是以 Json 的方式來儲存資料。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;[
+  {
+    &amp;#34;user_id&amp;#34;: 1,
+    &amp;#34;user_name&amp;#34;: &amp;#34;Alice&amp;#34;,
+    &amp;#34;email&amp;#34;: &amp;#34;alice@example.com&amp;#34;,
+    &amp;#34;age&amp;#34;: 30,
+  },
+  {
+    &amp;#34;user_id&amp;#34;: 2,
+    &amp;#34;user_name&amp;#34;: &amp;#34;Bob&amp;#34;,
+    &amp;#34;email&amp;#34;: &amp;#34;bob@example.com&amp;#34;,
+    &amp;#34;age&amp;#34;: 25,
+  },
+]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;mongodb 一開始並不支援 join，但是後來新增了 $lookup ，其行為類似於 SQL 的 JOIN。&lt;/p&gt;
+&lt;p&gt;NoSQL 資料庫通常是用於在分散式系統，所以需要考慮 CAP。&lt;/p&gt;
+&lt;h3 id=&#34;cap&#34;&gt;CAP
+&lt;/h3&gt;&lt;p&gt;CAP 理論指的是在一個分散式系統中，只能保證以下三者其二。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;一致性(Consistency):每次讀取操作都能取得系統中最新寫入的資料。&lt;/li&gt;
+&lt;li&gt;可用性(Availability):每次對系統的請求都能得到回覆。&lt;/li&gt;
+&lt;li&gt;分區容錯性(Partition Tolernce):當系統的不同節點支籤無法通訊，系統仍然能保持運作。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;index-1&#34;&gt;index
+&lt;/h3&gt;&lt;p&gt;NoSQL 使用 Hash function 將資料轉換為 Hash value，但也因此 nosql 的索引是無序的。&lt;/p&gt;
+&lt;h2 id=&#34;比較&#34;&gt;比較
+&lt;/h2&gt;&lt;h3 id=&#34;縱向擴展-vertical-scaling&#34;&gt;縱向擴展 (Vertical Scaling)
+&lt;/h3&gt;&lt;p&gt;縱向擴展指的是透過增加硬體提升效能(e.g.增加 CPU、memory&amp;hellip;)，來提升單個伺服器的效能。&lt;/p&gt;
+&lt;p&gt;SQL : 支援，對於 SQL 資料庫來說垂直擴展是最能增加效能的方法，隨著資料量增加，對於硬體的需求也會逐漸提高。&lt;/p&gt;
+&lt;p&gt;NoSQL : 支援&lt;/p&gt;
+&lt;h3 id=&#34;橫向擴展-horizontal-scaling&#34;&gt;橫向擴展 (Horizontal Scaling)
+&lt;/h3&gt;&lt;p&gt;橫向擴展指的是增加更多伺服器或節點來提升效能。&lt;/p&gt;
+&lt;p&gt;SQL:支援但不擅長，因為要維持 ACID，而 ACID 在不同 server 之間要維持原子性會非常困難。&lt;/p&gt;
+&lt;p&gt;NOSQL:支援，並且由於資料間沒有關聯性，NOSQL 能更好的運作在分散式系統。&lt;/p&gt;
+&lt;h3 id=&#34;寫入&#34;&gt;寫入
+&lt;/h3&gt;&lt;p&gt;SQL:為了保持ACID，當在處理高併發的大量寫入請求時會消耗更多資源並影響效能。&lt;/p&gt;
+&lt;p&gt;NOSQL:NOSQL 在處理高併發的大量寫入請求時，表現會比 SQL 來的好，原因是因為 NOSQL 的資料在寫入時不必立刻同步到所有 server，而是最終資料一致就好。&lt;/p&gt;
+&lt;h3 id=&#34;查詢&#34;&gt;查詢
+&lt;/h3&gt;&lt;p&gt;SQL:SQL 擅長處理複雜的查詢，特別是涉及多表 Join 以及複雜的過濾條件時。&lt;/p&gt;
+&lt;p&gt;NOSQL: 單一紀錄的查詢快，但是複雜的查詢，特別是涉及多表的查詢會相較 SQL 慢。&lt;/p&gt;
+&lt;h3 id=&#34;結論&#34;&gt;結論
+&lt;/h3&gt;&lt;p&gt;SQL:適合需要 ACID 來保證資料正確，複雜查詢的應用。&lt;/p&gt;
+&lt;p&gt;NOSQL:適合高效能寫入，需要在分散式系統運作，可接受最終一致性的應用。&lt;/p&gt;
+&lt;h2 id=&#34;補充&#34;&gt;補充
+&lt;/h2&gt;&lt;h3 id=&#34;isolation-level&#34;&gt;isolation level
+&lt;/h3&gt;&lt;p&gt;isolation 分成 四個 level，分別是為了解決不同狀況的需求。&lt;/p&gt;
+&lt;p&gt;先解釋資料庫在儲存時會遇到那些狀況。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Dirty Read : 一個交易向資料庫寫入資料時，還沒 commit，另一個交易卻讀取了尚未 commit 的資料
+&lt;ul&gt;
+&lt;li&gt;A 交易在一次交易中讀取了兩次資料，但是在第一次資料讀取跟第二次資料讀取之間，B交易將資料改寫了，導致兩次讀取資料的數值不同。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Non-repeatable reads : 同一個交易中讀取了多次資料，但是卻取得了不同的結果
+&lt;ul&gt;
+&lt;li&gt;A 交易在一次交易中讀取了多次資料，但是在資料讀取間，B交易改寫了資料並 commit，導致了A讀取了相同資料卻取得不同結果。&lt;/li&gt;
+&lt;li&gt;Dirty Read 也屬於 Non-repeatable reads 差別在於有沒有 commit&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Phantom reads: 當在同一個交易中，連續讀取資料取得的比數卻不同。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;為了解決這些狀況，於是將 isolation 分成 4 個 level&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Read Uncommited : 可以讀取為 commit 的資料。&lt;/li&gt;
+&lt;li&gt;Read Commited: 只能讀取到已 commit 的資料，解決 Dirty Read。&lt;/li&gt;
+&lt;li&gt;Repeatable Read: 同一交易中，只要搜尋條件相同，便能取得相同結果，解決 Non-repeatable reads。&lt;/li&gt;
+&lt;li&gt;Serializable: 多個 transaction 執行時，只要順序相同，得到的結果便相同，但是因為資料庫會確保 transaction 依序完成，會造成效能降低，解決 Phantom reads。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;參考&#34;&gt;參考:
+&lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://medium.com/appdev-ooops/%E8%B3%87%E6%96%99%E5%BA%AB-%E4%BD%A0%E7%9C%9F%E7%9A%84%E7%94%A8%E5%B0%8D%E4%BA%86%E5%97%8E-sql-vs-nosql-9621a05180d4&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://medium.com/appdev-ooops/%E8%B3%87%E6%96%99%E5%BA%AB-%E4%BD%A0%E7%9C%9F%E7%9A%84%E7%94%A8%E5%B0%8D%E4%BA%86%E5%97%8E-sql-vs-nosql-9621a05180d4&lt;/a&gt;
+&lt;a class=&#34;link&#34; href=&#34;https://www.codegym.tech/blog/sql-vs-nosql&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://www.codegym.tech/blog/sql-vs-nosql&lt;/a&gt;
+&lt;a class=&#34;link&#34; href=&#34;https://realnewbie.com/basic-concent/database/sql-vs-nosql-differences-beginner-guide/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://realnewbie.com/basic-concent/database/sql-vs-nosql-differences-beginner-guide/&lt;/a&gt;
+&lt;a class=&#34;link&#34; href=&#34;https://oldmo860617.medium.com/%E5%88%9D%E6%AD%A5%E8%AA%8D%E8%AD%98%E5%88%86%E6%95%A3%E5%BC%8F%E8%B3%87%E6%96%99%E5%BA%AB%E8%88%87-nosql-cap-%E7%90%86%E8%AB%96-a02d377938d1&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://oldmo860617.medium.com/%E5%88%9D%E6%AD%A5%E8%AA%8D%E8%AD%98%E5%88%86%E6%95%A3%E5%BC%8F%E8%B3%87%E6%96%99%E5%BA%AB%E8%88%87-nosql-cap-%E7%90%86%E8%AB%96-a02d377938d1&lt;/a&gt;
+&lt;a class=&#34;link&#34; href=&#34;https://www.mysql.tw/2024/05/mysql-innodb-isolation-level.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://www.mysql.tw/2024/05/mysql-innodb-isolation-level.html&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>Sqlalchemy</title>
         <link>https://example.com/post/sqlalchemy/</link>
         <pubDate>Tue, 13 May 2025 00:23:14 +0800</pubDate>
