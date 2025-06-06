@@ -45,6 +45,11 @@
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
+&lt;h3 id=&#34;缺點&#34;&gt;缺點:
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;根據使用的機制不同，如有多個資料庫寫入，需考慮資料同步的問題。&lt;/li&gt;
+&lt;li&gt;主資料庫錯誤的話，需要手動將從資料庫轉為主資料庫。&lt;/li&gt;
+&lt;/ol&gt;
 &lt;h2 id=&#34;使用-mysql-建立主從式架構&#34;&gt;使用 mysql 建立主從式架構
 &lt;/h2&gt;&lt;p&gt;可以參考我自己建立的&lt;a class=&#34;link&#34; href=&#34;https://github.com/jacketex894/System-design/tree/main/database_replication&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;例子&lt;/a&gt;&lt;/p&gt;
@@ -136,10 +141,9 @@ ENV MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
 
 #將設定套用到容器內的 mysql  資料庫
 COPY my.cnf /etc/mysql/my.cnf
-&lt;/code&gt;&lt;/pre&gt;&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;設定主資料庫&lt;/p&gt;
-&lt;p&gt;首先需要設定 my.cnf，新增以下內容，或著也可以直接使用範例中的 my.cnf 移除掉註解。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;set-up&#34;&gt;Set up
+&lt;/h2&gt;&lt;h3 id=&#34;1-設定主資料庫&#34;&gt;1. 設定主資料庫
+&lt;/h3&gt;&lt;p&gt;首先需要設定 my.cnf，新增以下內容，或著也可以直接使用範例中的 my.cnf 移除掉註解。&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# 設定 server 唯一id
 server-id=1
 # 設定 binlog 檔案最大容量
@@ -183,10 +187,8 @@ log_bin = mysql-bin
 | mysql-bin.000001 |      860 |              |                  |                   |
 +------------------+----------+--------------+------------------+-------------------+
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;請記下 File 跟 position 的內容，會在從資料庫的設定使用到。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;備份主資料庫資料到從資料庫
-先將 DB 設定為 read only，如果是正在線上的系統，此舉會影響到所有寫入功能，務必小心。&lt;/p&gt;
+&lt;h3 id=&#34;2-備份主資料庫資料到從資料庫&#34;&gt;2. 備份主資料庫資料到從資料庫
+&lt;/h3&gt;&lt;p&gt;先將 DB 設定為 read only，如果是正在線上的系統，此舉會影響到所有寫入功能，務必小心。&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mysql&amp;gt; FLUSH TABLES WITH READ LOCK;
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;退出 mysql 到 master-sql 的容器下達指令，備份資料。&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mysqldump -uroot -p  --all-databases &amp;gt; replication/master.sql
@@ -215,10 +217,8 @@ log_bin = mysql-bin
 | sys                |
 | user_db            |
 +--------------------+
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;設定從資料庫&lt;/p&gt;
-&lt;p&gt;首先需要設定 my.cnf，新增以下內容，或著也可以直接使用範例中的 my.cnf 移除掉註解。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;3-設定從資料庫&#34;&gt;3. 設定從資料庫
+&lt;/h3&gt;&lt;p&gt;首先需要設定 my.cnf，新增以下內容，或著也可以直接使用範例中的 my.cnf 移除掉註解。&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# 設定 server 唯一id
 server-id=2
 # 設定只能讀取
@@ -263,21 +263,13 @@ GET_MASTER_PUBLIC_KEY = 1;
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;看到以下內容顯示 YES 表示成功了。&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;Slave_IO_Running: Yes
 Slave_SQL_Running: Yes
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;設定主資料庫
-記得要解除 &lt;code&gt;2. 備份主資料庫資料到從資料庫&lt;/code&gt; 主資料庫 的 read only。
-&lt;code&gt;mysql&amp;gt; UNLOCK TABLES;&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;pre&gt;&lt;code&gt;可以嘗試在主資料庫 insert 一筆資料，確認從資料庫是否也有更新
-```
-mysql&amp;gt; USE user_db;
-INSERT INTO users (user_name, mail) VALUES (&#39;test&#39;, &#39;test@mail.com&#39;);
-SELECT * FROM users;
-```
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h2 id=&#34;參考&#34;&gt;參考:
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;4-設定主資料庫&#34;&gt;4. 設定主資料庫
+&lt;/h3&gt;&lt;p&gt;記得要解除 &lt;code&gt;2. 備份主資料庫資料到從資料庫&lt;/code&gt; 主資料庫 的 read only。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mysql&amp;gt; UNLOCK TABLES;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;可以嘗試在主資料庫 insert 一筆資料，確認從資料庫是否也有更新。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mysql&amp;gt; USE user_db;
+INSERT INTO users (user_name, mail) VALUES (&amp;#39;test&amp;#39;, &amp;#39;test@mail.com&amp;#39;);
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;參考&#34;&gt;參考:
 &lt;/h2&gt;&lt;ul&gt;
 &lt;li&gt;內行人才知道的系統設計面試指南&lt;/li&gt;
 &lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://homuchen.com/posts/what-and-why-database-replication-advantage-and-disadvantage/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
