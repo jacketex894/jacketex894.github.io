@@ -5,10 +5,16 @@
     <loc>https://example.com/</loc>
     <lastmod>2025-06-03T17:05:01+08:00</lastmod>
   </url><url>
+    <loc>https://example.com/categories/</loc>
+    <lastmod>2025-06-03T17:05:01+08:00</lastmod>
+  </url><url>
     <loc>https://example.com/post/database-replication/</loc>
     <lastmod>2025-06-03T17:05:01+08:00</lastmod>
   </url><url>
     <loc>https://example.com/post/</loc>
+    <lastmod>2025-06-03T17:05:01+08:00</lastmod>
+  </url><url>
+    <loc>https://example.com/categories/system-design/</loc>
     <lastmod>2025-06-03T17:05:01+08:00</lastmod>
   </url><url>
     <loc>https://example.com/post/sql-vs-nosql/</loc>
@@ -17,11 +23,17 @@
     <loc>https://example.com/post/sqlalchemy/</loc>
     <lastmod>2025-05-13T00:23:14+08:00</lastmod>
   </url><url>
+    <loc>https://example.com/categories/design-pattern/</loc>
+    <lastmod>2025-05-09T17:11:07+08:00</lastmod>
+  </url><url>
     <loc>https://example.com/post/design-pattern-factory/</loc>
     <lastmod>2025-05-09T17:11:07+08:00</lastmod>
   </url><url>
     <loc>https://example.com/post/design-pattern-strategy/</loc>
     <lastmod>2025-05-09T11:28:40+08:00</lastmod>
+  </url><url>
+    <loc>https://example.com/categories/coding/</loc>
+    <lastmod>2025-05-07T16:46:07+08:00</lastmod>
   </url><url>
     <loc>https://example.com/post/leetcode-53/</loc>
     <lastmod>2025-05-07T16:46:07+08:00</lastmod>
@@ -47,7 +59,11 @@
     <loc>https://example.com/post/jwt/</loc>
     <lastmod>2025-04-15T15:34:43+08:00</lastmod>
   </url><url>
-    <loc>https://example.com/categories/</loc>
+    <loc>https://example.com/page/about/</loc>
+  </url><url>
+    <loc>https://example.com/page/archives/</loc>
+  </url><url>
+    <loc>https://example.com/page/</loc>
   </url><url>
     <loc>https://example.com/tags/</loc>
   </url>

@@ -1,0 +1,573 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Coding on Jack&#39;s Note</title>
+        <link>https://example.com/categories/coding/</link>
+        <description>Recent content in Coding on Jack&#39;s Note</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-tw</language>
+        <lastBuildDate>Wed, 07 May 2025 16:46:07 +0800</lastBuildDate><atom:link href="https://example.com/categories/coding/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Leetcode 53</title>
+        <link>https://example.com/post/leetcode-53/</link>
+        <pubDate>Wed, 07 May 2025 16:46:07 +0800</pubDate>
+        
+        <guid>https://example.com/post/leetcode-53/</guid>
+        <description>&lt;h2 id=&#34;題目&#34;&gt;題目
+&lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://leetcode.com/problems/maximum-subarray/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;53. Maximum Subarray&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;給予一個數字陣列 nums, 找到該陣列的子集合中，相加最大的合，並且回傳合。&lt;/p&gt;
+&lt;h2 id=&#34;pseudocode&#34;&gt;Pseudocode
+&lt;/h2&gt;&lt;p&gt;這題我一開始的想法是應該是 DP 相關題目，直接暴力O(N^2)解會超時。
+我的思路是在計算和的時候，要想辦法沿用先前的計算。
+最大和的值，從 nums 的第0個元素開始，因為只有一個元素也是子集合。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;初始化 max_answer 為 nums[0] 用來記錄最大和
+初始化 temp = 0 用來記錄當前的和
+
+#以下用 max(A,B) 表示 A,B 中取較大者
+從第 0 個 元素開始逐一遍歷 nums:
+    當 temp + 元素 大於 max_answer:
+        # 當元素比 temp + 元素還大的時候，就應該要從元素開始計算了。
+        temp = max(元素,temp + 元素)
+        max_answer = temp
+    否則:
+        temp = max(元素,temp + 元素)
+        max_answer = max(max_answer,num)
+#確認到最後一個元素的連續和有沒有比目前的答案還大
+max_answer = max(temp,max_answer)
+
+回傳 max_answer
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其實我第一版的思路有一些重複計算的地方，因為我最開始的思路是&lt;code&gt;當 temp + 元素 大於 max_answer&lt;/code&gt; 時，應該要重置 temp，所以以上 Pseudocode 的內容是邊 debug 得出的。
+仔細想可以發現，其實無論如何當 temp + 元素比元素本身還要小的時候，就不該繼續計算合了。&lt;/p&gt;
+&lt;p&gt;舉以下兩個例子&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;目前迴圈都走到 index = 1
+
+[4,-1,2,1]
+4 + -1 &amp;gt; -1
+所以繼續計算下去 3 比從 -1 開始從頭計算還要大
+
+[-5,1,6,2]
+-5 + 1 &amp;lt; 1
+所以繼續計算下去 -4 比從 1 開始從頭計算還要小
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;而 max answer 在每次更新 temp 時確認是否有比較大就好，所以可以將程式碼簡化為&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;初始化 max_answer 為 nums[0] 用來記錄最大和
+初始化 temp = 0 用來記錄當前的和
+
+#以下用 max(A,B) 表示 A,B 中取較大者
+從第 0 個 元素開始逐一遍歷 nums:
+    temp = max(元素,temp + 元素)
+    max_answer = max(max_answer,num)
+
+回傳 max_answer
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;時間複雜度一樣是 O(N)，但後者的程式碼意義應該更為清楚。&lt;/p&gt;
+&lt;h2 id=&#34;python&#34;&gt;Python
+&lt;/h2&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;class Solution:
+    def maxSubArray(self, nums: List[int]) -&amp;gt; int:
+        max_answer = nums[0]
+        temp = 0
+        for num in nums:
+            temp = max(num,temp + num)
+            max_answer = max(max_answer,temp)
+        return max_answer
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;go&#34;&gt;Go
+&lt;/h2&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;func max(A,B int)int {
+    if (A &amp;gt; B){
+        return A
+    }
+    return B
+}
+func maxSubArray(nums []int) int {
+    max_answer := nums[0]
+    temp := 0
+    for index := 0 ; index &amp;lt; len(nums) ; index ++{
+        temp = max(nums[index],temp + nums[index])
+        max_answer = max(max_answer,temp)
+    }
+    return max_answer
+}
+&lt;/code&gt;&lt;/pre&gt;</description>
+        </item>
+        <item>
+        <title>Leetcode 347</title>
+        <link>https://example.com/post/leetcode-347/</link>
+        <pubDate>Tue, 06 May 2025 21:07:33 +0800</pubDate>
+        
+        <guid>https://example.com/post/leetcode-347/</guid>
+        <description>&lt;h2 id=&#34;題目&#34;&gt;題目
+&lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://leetcode.com/problems/top-k-frequent-elements&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;347. Top K Frequent Elements&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;給予一個數字陣列 nums 跟數字 k ，回傳這個數字陣列中出現的數字頻率前 K 多的數字。
+題目有保證 answer 是 unique ， 所以我認為不用考慮到頻率有相等，但剛好在第 K 跟第 K + 1 的狀況。&lt;/p&gt;
+&lt;h2 id=&#34;pseudocode&#34;&gt;Pseudocode
+&lt;/h2&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;初始化一個 frequency map 用來記錄元素出現頻率
+從第 0 個元素開始遍歷 nums:
+    如果元素沒有出現過:
+        將元素作為 key 在 frequency 中對應 0
+    將 frequency 中的元素對應的 value + 1，紀錄出現頻率 + 1 
+根據 frequency 內的 value 去排序對應的 key 出現頻率的多寡
+將排序結果中前 K 大的 key 回傳
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;時間複雜度會根據排序的演算法而有不同，如果是 Python 的 sorted 或 go 的 sort是O(n log n)&lt;/p&gt;
+&lt;h2 id=&#34;python&#34;&gt;Python
+&lt;/h2&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;class Solution:
+    def topKFrequent(self, nums: List[int], k: int) -&amp;gt; List[int]:
+        frequency = {}
+        for num in nums:
+            if num not in frequency:
+                frequency[num] = 0
+            frequency[num] += 1
+        
+        answer = sorted(frequency.keys(),key = lambda x: frequency[x],reverse=True)
+        return answer[:k]
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;go&#34;&gt;Go
+&lt;/h3&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;import (
+    &amp;#34;fmt&amp;#34;
+    &amp;#34;sort&amp;#34;
+)
+
+func topKFrequent(nums []int, k int) []int {
+    frequency :=  map[int]int{}
+    for index:=0;index &amp;lt; len(nums);index += 1{
+        if _,ok := frequency[nums[index]]; !ok{
+            frequency[nums[index]] = 0
+        }
+        frequency[nums[index]] += 1
+    }
+    answer := []int{}
+    for number := range frequency{
+        answer = append(answer,number)
+    }
+
+    sort.Slice(answer,func(i,j int) bool{
+        return frequency[answer[i]] &amp;gt; frequency[answer[j]]
+    })
+    return answer[:k]
+}
+&lt;/code&gt;&lt;/pre&gt;</description>
+        </item>
+        <item>
+        <title>Leetcode 49</title>
+        <link>https://example.com/post/leetcode-49/</link>
+        <pubDate>Fri, 02 May 2025 14:37:32 +0800</pubDate>
+        
+        <guid>https://example.com/post/leetcode-49/</guid>
+        <description>&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://leetcode.com/problems/group-anagrams&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;49. Group anagram&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;給予一個字串陣列，將相同的 angram 放在一個陣列中(為求方便，稱呼其為 angram 陣列)， 再將所有 angram 陣列放到一個陣列後回傳，可以以任何順序回傳。&lt;/p&gt;
+&lt;h2 id=&#34;pseudocode---1&#34;&gt;Pseudocode - 1
+&lt;/h2&gt;&lt;p&gt;此題跟 &lt;a class=&#34;link&#34; href=&#34;https://example.com/post/leetcode-242/&#34; &gt;leetcode-242&lt;/a&gt; 很像。
+嘗試呼叫 &lt;a class=&#34;link&#34; href=&#34;https://example.com/post/leetcode-242/&#34; &gt;leetcode-242&lt;/a&gt; 的 isAnaragram 來解決這題。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;從第 0 個字串開始，逐一遍例輸入字串陣列的每一個字串：
+    確認目前字串有無被確認為其他字串的 angram：
+        跳下一個字串繼續
+    從第一個迴圈取得的字串後的字串開始，逐一遍歷輸入字串陣列的每一個字串：
+        確認取得的字串有無被確認為其他字串的 angram：
+            跳下一個字串繼續
+        確認取得字串是否是目前字串的 angram，是的話記錄下來
+    將目前字串跟目前字串的 angram 都放入答案
+回傳所有答案
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;時間複雜度: O(N^2)
+這裡的時間複雜度不包含確認兩個字串是否是彼此的 angram。
+假設 Ｌ 是字串長度的話（先不考慮所有字串的長度是否都相同為Ｌ），那麼計算兩個字串是否是彼此的 angram 的時間複雜度為: O(L)。
+此解法的時間複雜度為: O(N ^ 2 * L)。
+但是，直接 submit 會得到超時。&lt;/p&gt;
+&lt;h2 id=&#34;go&#34;&gt;Go
+&lt;/h2&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;func isAnagram(s string, t string) bool {
+    if len(s) != len(t){
+        return false
+    }
+    appear := map[byte]int{}
+
+    for index := 0 ; index &amp;lt; len(s) ; index += 1{
+        if _,ok := appear[s[index]]; !ok{
+            appear[s[index]] = 0
+        }
+        appear[s[index]] += 1
+    }
+    for index:=0 ; index &amp;lt; len(t) ; index += 1{
+        if value,ok := appear[t[index]]; ok &amp;amp;&amp;amp; value &amp;gt; 0{
+            appear[t[index]] -= 1
+        }else{
+            return false
+        }
+    }
+    return true
+}
+func groupAnagrams(strs []string) [][]string {
+    find := map[int]bool{}
+    answers := [][]string{}
+    for index := 0 ; index &amp;lt; len(strs) ; index +=1{
+        answer := []string{}
+        if find[index]{
+            continue
+        }
+        find[index] = true
+        for second_index := index + 1 ; second_index &amp;lt; len(strs); second_index += 1{
+            if find[second_index]{
+                continue
+            }else{
+                if isAnagram(strs[index], strs[second_index]){
+                    answer = append(answer,strs[second_index])
+                    find[second_index] = true
+                }
+            }
+        }
+        answer = append(answer,strs[index])
+        answers = append(answers,answer)
+    }
+    return answers
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;pseudocode---2&#34;&gt;Pseudocode - 2
+&lt;/h2&gt;&lt;p&gt;既然超時的話，就要考慮到可以如何降低時間複雜度。
+目前是兩兩比較是否是 angram，換個想法來說，其實是兩個字串在比較是否完全是由相同字元組成，但是字元順序可能不同。
+那如果字元順序相同的話，是否可以直接比較字串是否相同，甚至是將字串作為 key 放入 hash table，借助 hash table O(1) ~ O(N) 的速度來判斷字串是否出現過就好，便可以縮短兩兩比較所需的 O(N^2) 時間了。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;初始化 hash table &amp;#34;appear&amp;#34; key 是 sorted 過後的字串，value 是陣列，用來存放原本字串。
+從第 0 個字串開始，逐一遍例輸入字串陣列的每一個字串：
+    排序目前字串
+    確認目前排序字串有無出現過，若無出現過：
+        初始化 appear[排序目前字串] 為空陣列
+    將目前字串加入 appear[排序目前字串]
+將 appear 中的所有陣列提取出來，放入到一個陣列後回傳。
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;時間複雜度：O(N)
+這裡的時間複雜度不包含sort字串。
+假設 Ｌ 是字串長度的話（先不考慮所有字串的長度是否都相同為Ｌ），那 sort 字串的時間會再根據 sort 的方法不同而有不同。&lt;/p&gt;
+&lt;p&gt;假設都使用語言的 sort function:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Python: O(L log L)&lt;/li&gt;
+&lt;li&gt;GO: O(L Log L)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;python&#34;&gt;Python
+&lt;/h2&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;def groupAnagrams(self, strs: List[str]) -&amp;gt; List[List[str]]:
+    appear = {}
+    for word in strs:
+        sort_word = &amp;#39;&amp;#39;.join(sorted(word))
+        if sort_word not in appear:
+            appear[sort_word] = []
+        appear[sort_word].append(word)
+    answer = []
+    for sort_word,words in appear.items():
+        answer.append(words)
+    return answer
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;go-1&#34;&gt;GO
+&lt;/h2&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;import (&amp;#34;sort&amp;#34;
+)
+func groupAnagrams(strs []string) [][]string {
+    appear := map[string][]string{}
+    for index:= 0 ; index &amp;lt; len(strs) ; index += 1{
+        words := []byte(strs[index])
+        sort.Slice(words, func (i,j int) bool {
+            return words[i] &amp;lt; words[j]
+        })
+        sort_words := string(words)
+        if _,ok := appear[sort_words];!ok{
+            appear[sort_words] = []string{}
+        }
+        appear[sort_words] = append(appear[sort_words],strs[index])
+    }
+    answer := [][]string{}
+    for _,words := range appear{
+            answer = append(answer,words)
+    }
+    return answer
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;reference&#34;&gt;Reference
+&lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://ithelp.ithome.com.tw/articles/10268906?sc=iThelpR&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://ithelp.ithome.com.tw/articles/10268906?sc=iThelpR&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>Leetcode 242</title>
+        <link>https://example.com/post/leetcode-242/</link>
+        <pubDate>Tue, 29 Apr 2025 18:35:49 +0800</pubDate>
+        
+        <guid>https://example.com/post/leetcode-242/</guid>
+        <description>&lt;h2 id=&#34;題目&#34;&gt;題目
+&lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://leetcode.com/problems/valid-anagram&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;242. Valid Anagram&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;給予兩個字串 s 跟 t ， 判斷 t 是否是 s 的 anagram。
+是的話回傳 true ， 不是的話，回傳 False。
+anagram 指的是 t 字串的字元是否完全來自於 s ，並且每一個字元只被使用一次。&lt;/p&gt;
+&lt;h2 id=&#34;pseudocode&#34;&gt;Pseudocode
+&lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://example.com/post/leetcode-217/&#34; &gt;leetcode-217&lt;/a&gt; 的延伸題。&lt;/p&gt;
+&lt;p&gt;根據題義可以判斷 s 跟 t 的長度必須相同，所以當長度不同便可直接回傳 false。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;如果 s 的長度不等於 t 的長度:
+    回傳 false
+
+從第 0 個字元開始，逐一遍歷 s 的每一個字元:
+    紀錄字元出現的頻率
+從第 0 個字元開始，逐一遍歷 t 的每一個字元:
+    比對字元是否在 s 出現過，以及是否超過 s 的頻率，若並未出現過或超出頻率:
+        回傳 false
+通過所有檢查，回傳 true
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;時間複雜度:O(N)&lt;/p&gt;
+&lt;h2 id=&#34;go&#34;&gt;Go
+&lt;/h2&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;func isAnagram(s string, t string) bool {
+    if len(s) != len(t){
+        return false
+    }
+    appear := map[byte]int{}
+
+    for index := 0 ; index &amp;lt; len(s) ; index += 1{
+        if _,ok := appear[s[index]]; !ok{
+            appear[s[index]] = 0
+        }
+        appear[s[index]] += 1
+    }
+    for index:=0 ; index &amp;lt; len(t) ; index += 1{
+        if value,ok := appear[t[index]]; ok &amp;amp;&amp;amp; value &amp;gt; 0{
+            appear[t[index]] -= 1
+        }else{
+            return false
+        }
+    }
+    return true
+}
+&lt;/code&gt;&lt;/pre&gt;</description>
+        </item>
+        <item>
+        <title>Go Map</title>
+        <link>https://example.com/post/go-map/</link>
+        <pubDate>Tue, 29 Apr 2025 14:37:14 +0800</pubDate>
+        
+        <guid>https://example.com/post/go-map/</guid>
+        <description>&lt;h2 id=&#34;map&#34;&gt;map
+&lt;/h2&gt;&lt;p&gt;map 是 Go 中的哈希表（hash table），與 Python 中的 dict 類似。不過，Go 的 map 需要事先定義 key 和 value 的資料型別，並且 key 和 value 必須是相同資料型別的集合。&lt;/p&gt;
+&lt;p&gt;map 的型態如下&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;map[KeyType]ValueType
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;宣告&#34;&gt;宣告
+&lt;/h3&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;var m map[string][int]
+m = make(map[string]int)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在 Go 中，使用 var 宣告一個 map 時，會得到一個 nil map，也就是尚未初始化的狀態。
+若在未經初始化的情況下對 map 進行寫入操作（例如新增鍵值對），會得到錯誤訊息:  panic: assignment to entry in nil map
+因此，必須使用 make 函數來初始化 map 才能進行寫入。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;m := map[string]int{}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;也可以使用 := 來直接建立空 map，透過此方式建立的 map 可以直接進行寫入。&lt;/p&gt;
+&lt;h3 id=&#34;修改新增&#34;&gt;修改/新增
+&lt;/h3&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;m[&amp;#34;apple&amp;#34;] = 3
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;map 可以直接透過 key 來新增或修改元素。&lt;/p&gt;
+&lt;h3 id=&#34;查詢&#34;&gt;查詢
+&lt;/h3&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;m[&amp;#34;apple&amp;#34;]
+i := m[&amp;#34;apple&amp;#34;]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;map 可以直接透過 key 來查詢值，若是 key 不存在，會得到值 0。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;value,ok := m[&amp;#34;apple&amp;#34;]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;或著也可以透過兩個 assignment 的方法來確認 key 是否存在在 map。
+value 會存放 key 所對應的值，若是 key 不存在於 map 則會是0。
+ok 是布林值， true 表示 key 存在於 map， false 表示 key 不存在於 map。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;_,ok := m[&amp;#34;apple&amp;#34;]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果希望在不檢索值的狀況下確認 key，可以使用 _ 。
+這樣可以避免宣告了 value 卻沒使用，導致 go 編譯時報錯。&lt;/p&gt;
+&lt;h3 id=&#34;刪除&#34;&gt;刪除
+&lt;/h3&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;delete(m,&amp;#34;apple&amp;#34;)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;可以透過 delete 來刪除 key，delete 不會回傳任何東西，若是指定的 key 不存在 map ，則不會做任何事。&lt;/p&gt;
+&lt;h3 id=&#34;遍歷&#34;&gt;遍歷
+&lt;/h3&gt;&lt;p&gt;map 是無序的，所以不能保證每次遍歷都可以是相同的順序。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;package main
+
+import &amp;#34;fmt&amp;#34;
+
+func main() {
+    m := map[string]int{
+        &amp;#34;apple&amp;#34;:  5,
+        &amp;#34;banana&amp;#34;: 2,
+        &amp;#34;cherry&amp;#34;: 7,
+    }
+    for key, value := range m {
+        fmt.Println(key, value)
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;可以透過以上的程式碼多跑幾次去測試。
+第一次執行可能是&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;apple 5
+banana 2
+cherry 7
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;但第二次執行可能就變成&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;banana 2
+cherry 7
+apple 5
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;當然也有可能連續兩次執行都是相同順序，所以當有需要 map 以特定順序遍歷的時候，最好是另外儲存 key ，再對 key 進行 sort。&lt;/p&gt;
+&lt;h2 id=&#34;參考&#34;&gt;參考
+&lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://go.dev/blog/maps&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://go.dev/blog/maps&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>Leetcode 217</title>
+        <link>https://example.com/post/leetcode-217/</link>
+        <pubDate>Sun, 27 Apr 2025 11:44:03 +0800</pubDate>
+        
+        <guid>https://example.com/post/leetcode-217/</guid>
+        <description>&lt;h2 id=&#34;題目&#34;&gt;題目
+&lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://leetcode.com/problems/contains-duplicate/description/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;217. Contains Duplicate&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;給予一個數字陣列 nums，如果陣列中有重複的元素就回傳 True, 否則回傳 False。&lt;/p&gt;
+&lt;h2 id=&#34;pseudocode&#34;&gt;Pseudocode
+&lt;/h2&gt;&lt;p&gt;這題是蠻簡單的題目，可以透過將元素存入類似 python 的 dict，這類的 hash table 來解決。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;從第 0 個元素開始，逐一遍歷 nums 中的每一個元素:
+    如果元素沒有出現過:
+        將元素紀錄下來用於比對是否出現過
+    如果元束出現過:
+        回傳 True 值
+當遍歷完 nums 依然沒有重複元素:
+回傳 False 值
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;go&#34;&gt;Go
+&lt;/h2&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;func containsDuplicate(nums []int) bool {
+    appear := map[int]bool{}
+    for i := 0 ; i &amp;lt; len(nums) ; i ++{
+        if _,ok := appear[nums[i]]; ok{
+            return true
+        }else{
+            appear[nums[i]] = true
+        }
+    }
+    return false
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;主要使用了 map 來紀錄出現過的元素。
+關於 map 請參考 &lt;a class=&#34;link&#34; href=&#34;https://example.com/post/go-map/&#34; &gt;go-map&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>Leetcode 228</title>
+        <link>https://example.com/post/leetcode-228/</link>
+        <pubDate>Mon, 21 Apr 2025 16:52:48 +0800</pubDate>
+        
+        <guid>https://example.com/post/leetcode-228/</guid>
+        <description>&lt;h2 id=&#34;題目&#34;&gt;題目
+&lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://leetcode.com/problems/summary-ranges/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;228. Summart Ranges&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;給予一個 sorted 過的數字陣列，要求依照給定的數字陣列中的連續數字輸出字串陣列。
+e.g.
+input : [0,1,2,4,5,7]
+output : [&amp;ldquo;0-&amp;gt;2&amp;rdquo;,&amp;ldquo;4-&amp;gt;5&amp;rdquo;,&amp;ldquo;7&amp;rdquo;]&lt;/p&gt;
+&lt;p&gt;數字陣列中連續數字分別為 [0,1,2] [4,5] [7]。
+所以根據題意可以拆解成三個區間字串 &amp;ldquo;0 -&amp;gt; 2&amp;rdquo; , &amp;ldquo;4 -&amp;gt; 5&amp;rdquo; , &amp;ldquo;7&amp;rdquo;&lt;/p&gt;
+&lt;p&gt;根據題目說明，數字陣列長度可能為 0 ，所以需要考慮此特殊狀況。
+input 的每一個元素都是獨立的，並且從小排到大。&lt;/p&gt;
+&lt;h2 id=&#34;pseudocode&#34;&gt;Pseudocode
+&lt;/h2&gt;&lt;p&gt;首先，先將應實作邏輯整理出來，好讓後面可以使用不同語言實作。
+目的是為了邊學習 go 語言的基本操作。&lt;/p&gt;
+&lt;p&gt;先針對特例做處理，當收到一個空陣列的時候，應該回傳一個空陣列，而不是繼續其他操作。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;如果 input 是 空陣列:
+    回傳空陣列
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;接下來處理連續數字的邏輯:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;當遍歷 input 的時候，需要確認遍歷的元素是否跟前一個元素是連續的。&lt;/li&gt;
+&lt;li&gt;如果不連續的話，便產生一個字串放入需回傳的答案陣列。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;這裡需要兩個陣列:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;temp_arr : 用來存放與確認目前遍歷的元素是否是連續數字所使用。&lt;/li&gt;
+&lt;li&gt;answer : 用來存放要回傳的答案。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# 從第 0 個元素開始存放，迴圈從第 1 個元素開始跟前一個元素比對
+初始化 temp_arr 為 [input[0]]
+初始化 answer 為空陣列
+
+從第 1 個元素開始，逐一遍歷 input 中的元素:
+    如果 當前元素 不等於 temp_arr 最後一個元素 + 1:
+        # 表示不連續，需結束目前區間
+        將 temp_arr 根據題義轉為區間字串並加入 answer
+        初始化 temp_arr 為 [當前元素]
+    否則:
+        將當前元素加入 temp_arr
+
+# 處理最後一段尚未加入的區間
+將 temp_arr 根據題義轉為區間字串並加入 answer
+
+回傳 answer
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;根據題義產生區間字串的過程，由於在遍歷與遍歷完成後都需要使用到，所以另外寫成 function，方便修改。
+根據題義產生區間字串會需要連續數字的第 0 個數字 + &amp;ldquo;-&amp;gt;&amp;rdquo; + 最後一個數字。
+但是如果如果不連續，只有單一個數字的話，則只要輸出該數字即可。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;字串 = temp_arr 中的第0個元素
+如果 temp_arr 的大小超過 1:
+    字串加上 &amp;#34;-&amp;gt;&amp;#34; 以及 最後一個元素
+回傳字串
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;子函式產生區間字串&#34;&gt;子函式：產生區間字串
+&lt;/h3&gt;&lt;p&gt;Input : temp_arr，一個包含連續整數的子區段
+Output : 符合題目格式的字串表示，例如 &amp;ldquo;1-&amp;gt;3&amp;rdquo; 或 &amp;ldquo;5&amp;rdquo;&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;初始化 字串 為 temp_arr 的第一個元素（轉成字串）
+
+如果 temp_arr 的長度大於 1:
+    將字串加上 &amp;#34;-&amp;gt;&amp;#34; 和 temp_arr 的最後一個元素（轉成字串）
+
+回傳字串
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Note:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果只有一個數字，直接輸出該數字。&lt;/li&gt;
+&lt;li&gt;如果是一段連續區間（例如 [1,2,3]），輸出 &amp;ldquo;1-&amp;gt;3&amp;rdquo;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;主函式&#34;&gt;主函式
+&lt;/h3&gt;&lt;p&gt;Input : 一個遞增排序的整數陣列 nums（無重複）
+output : 將所有連續的整數區段，以字串格式表示的陣列&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;如果 input 是 空陣列:
+    回傳空陣列
+
+# 從第 0 個元素開始存放，迴圈從第 1 個元素開始跟前一個元素比對
+初始化 temp_arr 為 [input[0]]
+初始化 answer 為空陣列
+
+從第 1 個元素開始，逐一遍歷 input 中的元素:
+    如果 當前元素 不等於 temp_arr 最後一個元素 + 1:
+        # 表示不連續，需結束目前區間
+        將 temp_arr 根據題義轉為字串並加入 answer
+        初始化 temp_arr 為 [當前元素]
+    否則:
+        將當前元素加入 temp_arr
+
+# 處理最後一段尚未加入的區間
+將 temp_arr 根據題義轉為字串並加入 answer
+
+回傳 answer
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;python&#34;&gt;Python
+&lt;/h2&gt;&lt;p&gt;用熟悉的 python 實作，驗證邏輯&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;class Solution:
+    def get_answer_string(self,temp_arr: List[int]) -&amp;gt; str:
+        answer_string  = f&amp;#34;{temp_arr[0]}&amp;#34;
+        if len(temp_arr) &amp;gt; 1:
+            answer_string += f&amp;#34;-&amp;gt;{temp_arr[-1]}&amp;#34;
+        return answer_string
+    def summaryRanges(self, nums: List[int]) -&amp;gt; List[str]:
+        if not len(nums):
+            return []
+        temp_arr = [nums[0]]
+        answer = []
+        for index in range(1,len(nums)):
+            if nums[index] - 1 != temp_arr[-1]:
+                answer_string = self.get_answer_string(temp_arr)
+                temp_arr = [nums[index]]
+                answer.append(answer_string)
+            else:
+                temp_arr.append(nums[index])
+        answer_string = self.get_answer_string(temp_arr)
+        answer.append(answer_string)
+        return answer
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;go&#34;&gt;GO
+&lt;/h2&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;import &amp;#34;strconv&amp;#34;
+
+func get_answer_string(temp_arr [] int) string{
+    answer_string := strconv.Itoa(temp_arr[0])
+    if len(temp_arr) &amp;gt; 1{
+        answer_string += &amp;#34;-&amp;gt;&amp;#34; + strconv.Itoa(temp_arr[len(temp_arr) - 1])
+    }
+    return answer_string
+}
+func summaryRanges(nums []int) []string {
+    if len(nums) == 0{
+        return []string{}
+    }
+    var temp_arr = []int{}
+    var answer = []string{}
+    temp_arr = append(temp_arr,nums[0])
+    for index := 1 ; index &amp;lt; len(nums); index ++{
+        if nums[index] - 1  != temp_arr[len(temp_arr) - 1]{
+            answer_string := get_answer_string(temp_arr)
+            answer = append(answer,answer_string)
+            temp_arr = []int{}
+        }
+        temp_arr = append(temp_arr,nums[index])
+    }
+    answer_string := get_answer_string(temp_arr)
+    answer = append(answer,answer_string)
+return answer
+}
+&lt;/code&gt;&lt;/pre&gt;</description>
+        </item>
+        
+    </channel>
+</rss>
