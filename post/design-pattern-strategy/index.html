@@ -6,7 +6,7 @@
 
 <link rel='canonical' href='https://example.com/post/design-pattern-strategy/'>
 
-<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Design Pattern Strategy">
+<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Design Pattern Strategy">
 <meta property='og:description' content="策略模式 將可互換的演算法封裝為獨立的類別，透過統一介面使用類別，使得變更行為時，不必因行為變化而重新修改類別本身。\n以 python 舉個例子，假設我今天有個旅遊類別如下。\nclass Travel(): def hotel(self): print(&#39;Staying at the Taiwan Hotel.&#39;) def transport(self,distance:int): print(f&#34;Walk for {distance / 1} minutes.&#34;) 但是我目前有個需求是要新增一個新的交通方式:&ldquo;開車&rdquo;，他的時間計算跟原本的走路的計算方式不一樣。 那這時我們可以選擇:\n繼承 Travel 類別，並複寫 transport function。 需要為此撰寫一個新的類別，假設 hotel 不一樣也會需要複寫，當有幾種 hotel 跟幾種 transport 的組合，就需要寫多少類別，在維護上會是一大難題。 直接修改 transport 透過參數來選擇使用哪種交通工具，但是會需要確認是否影響了既有功能，當功能是複雜功能時有可能造成無法預期的錯誤。 一開始使用策略模式設計類別就可以避免以上兩者的缺點，我們可以將 transport 會需要作的內容定義為介面。\nfrom abc import ABC,abstractmethod class TransportStrategy(ABC): @abstractmethod def transport(self,distance:int): pass 定義了每個 transport 都該有的行為後，就可以設計類別會直接執行行為而不用顧慮是哪種 transport。 可以重新定義類別為\nclass Travel(): def __init__(self,transport_strategy:TransportStrategy): self.transport_handler = transport_strategy() def hotel(self): print(&#39;Staying at the Taiwan Hotel.&#39;) def transport(self,distance:int): self.transport_handler.transport(distance) 然後另外定義各種 TransportStrategy\n">
 <meta property='og:url' content='https://example.com/post/design-pattern-strategy/'>
 <meta property='og:site_name' content='Jack&#39;s Note'>

@@ -6,7 +6,7 @@
 
 <link rel='canonical' href='https://example.com/post/go-map/'>
 
-<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Go Map">
+<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Go Map">
 <meta property='og:description' content="map map 是 Go 中的哈希表（hash table），與 Python 中的 dict 類似。不過，Go 的 map 需要事先定義 key 和 value 的資料型別，並且 key 和 value 必須是相同資料型別的集合。\nmap 的型態如下\nmap[KeyType]ValueType 宣告 var m map[string][int] m = make(map[string]int) 在 Go 中，使用 var 宣告一個 map 時，會得到一個 nil map，也就是尚未初始化的狀態。 若在未經初始化的情況下對 map 進行寫入操作（例如新增鍵值對），會得到錯誤訊息: panic: assignment to entry in nil map 因此，必須使用 make 函數來初始化 map 才能進行寫入。\nm := map[string]int{} 也可以使用 := 來直接建立空 map，透過此方式建立的 map 可以直接進行寫入。\n修改/新增 m[&#34;apple&#34;] = 3 map 可以直接透過 key 來新增或修改元素。\n">
 <meta property='og:url' content='https://example.com/post/go-map/'>
 <meta property='og:site_name' content='Jack&#39;s Note'>

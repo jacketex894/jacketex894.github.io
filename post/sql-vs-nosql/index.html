@@ -6,7 +6,7 @@
 
 <link rel='canonical' href='https://example.com/post/sql-vs-nosql/'>
 
-<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="SQL vs NoSQL">
+<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="SQL vs NoSQL">
 <meta property='og:description' content="SQL (Structured Query Language) SQL 是指一種查詢語言，用來跟關聯式資料庫(RDBMS,Relational Database Management System)互動。\nRDBMS (Relational Database Management System) 使用 Table 來儲存管理資料，Table 中會以表格的方式儲存資料，如下所示。\nuser_id user_name email 0 Jack example@test.com 同一欄位的資料，會規定是要相同的資料型態。\n每個表格會有一個 Primary Key，用來唯一識別每條資料。\n表格跟表格之間可以建立關聯(join)，表示表格可以特過特定的欄位資料來跟另一個表格相互關聯。\n以以下兩張表來做說明\nusers\nuser_id user_name email 0 Jack example@test.com user_detail\nuser_name Age Jack 28 假如想要查詢使用者姓名、電子郵件、年齡，可以透過 SQL 語法關聯。\nSELECT users.user_name, users.email, user_details.Age FROM users INNER JOIN user_details ON users.user_name = user_details.user_name; user_id user_name email 0 Jack example@test.com RDBMS 具備 ACID 特性，在資料庫中，使用一筆交易(transaction)來指一組資料庫操作，以下以交易來解釋 ACID。\n">
 <meta property='og:url' content='https://example.com/post/sql-vs-nosql/'>
 <meta property='og:site_name' content='Jack&#39;s Note'>

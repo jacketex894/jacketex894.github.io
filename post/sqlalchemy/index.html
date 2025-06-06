@@ -6,7 +6,7 @@
 
 <link rel='canonical' href='https://example.com/post/sqlalchemy/'>
 
-<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Sqlalchemy">
+<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Sqlalchemy">
 <meta property='og:description' content="前言 學到了 connection pool，想說要來 optimize 自己的 side project。\n沒想到研究了半天，原本使用的 Sqlalchemy 就已經有內建有做了。\n因此做個筆記紀錄一下，也給自己一個警惕，比起請 AI 直接開始改寫，不如先去讀一下官方文件，養成閱讀官方文件的習慣。\n在使用 AI 上也要更小心自己不夠了解的部分，避免被幻覺誤導。\nConnection pool 每當跟資料庫要求 CRUD 操作時，都需要跟資料庫建立連線、進行操作、關閉連線。 建立連線跟關閉連線的動作對資料庫來說是很消耗資源的，connection pool 就是為了解決消耗資源的問題。\nconnection pool 相當於連線的快取，程式會事先建立固定的連線數量，當要跟資料庫要求執行操作時，會從 connection pool 中取得已事先建立好的連線，完成操作後再歸還。\n透過重複使用已建立的連線，來減少每次操作都建立連線再關閉連線所消耗的資源。\n以下會先事先建立好資料庫，用於比較有 connection pool 跟沒有 connection pool 查詢的差異。\nmysql.connector mysql.connector 是由 MySQL 官方提供的 lib。 會先利用此 lib 的方法來連接資料庫做查詢。\nmysql.connector 的使用方法\n透過 mysql.connector.connect 來設定基本設定以及建立連線，這裡不設定 port 是因為在測試範例中使用的是 mysql 的 default port 3306。 透過 connection.cursor() 建立 cursor，透過 cursor 跟 DB 溝通(傳遞 SQL 指令跟取回結果)。 without_pool 每次查詢都會建立連線查詢，再關閉連線。\n">
 <meta property='og:url' content='https://example.com/post/sqlalchemy/'>
 <meta property='og:site_name' content='Jack&#39;s Note'>

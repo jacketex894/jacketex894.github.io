@@ -6,7 +6,7 @@
 
 <link rel='canonical' href='https://example.com/post/leetcode-347/'>
 
-<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Leetcode 347">
+<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Leetcode 347">
 <meta property='og:description' content="題目 347. Top K Frequent Elements\n給予一個數字陣列 nums 跟數字 k ，回傳這個數字陣列中出現的數字頻率前 K 多的數字。 題目有保證 answer 是 unique ， 所以我認為不用考慮到頻率有相等，但剛好在第 K 跟第 K + 1 的狀況。\nPseudocode 初始化一個 frequency map 用來記錄元素出現頻率 從第 0 個元素開始遍歷 nums: 如果元素沒有出現過: 將元素作為 key 在 frequency 中對應 0 將 frequency 中的元素對應的 value + 1，紀錄出現頻率 + 1 根據 frequency 內的 value 去排序對應的 key 出現頻率的多寡 將排序結果中前 K 大的 key 回傳 時間複雜度會根據排序的演算法而有不同，如果是 Python 的 sorted 或 go 的 sort是O(n log n)\n">
 <meta property='og:url' content='https://example.com/post/leetcode-347/'>
 <meta property='og:site_name' content='Jack&#39;s Note'>

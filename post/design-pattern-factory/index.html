@@ -6,7 +6,7 @@
 
 <link rel='canonical' href='https://example.com/post/design-pattern-factory/'>
 
-<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Design Pattern Factory">
+<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Design Pattern Factory">
 <meta property='og:description' content="工廠模式 封裝建立物件的邏輯，讓使用者無須在意物件創建的相關邏輯(e.g. 讀取設定檔&hellip;)。\n在工廠模式中，會將封裝建立物件邏輯的類別稱為工廠，而實際建立的物件稱為產品，就像普通人並不會知道工廠運作的邏輯，但知道工廠生產什麼產品一樣。 工廠模式的目的是讓使用者(需要物件的function或邏輯)，無需在意這些物件建立的相關邏輯。\n以下會以漫畫(comic)作為產品 來舉例說明，假設我有兩種漫畫，分別是 funny 跟 adventure。 我想要取得漫畫物件最簡單的方法是透過 if 來判斷該創立哪種物件。\nfrom abc import ABC, abstractmethod class Book(ABC): @abstractmethod def content(self) -&gt; str: pass @abstractmethod def cost(self) -&gt; int: pass class FunnyComics(Book): def content(self) -&gt; str: return &#39;This is funny comic&#39; def cost(self) -&gt; int: return 4 class AdventureComics(Book): def content(self) -&gt; str: return &#39;This is adventure comic&#39; def cost(self) -&gt; int: return 3 def buy_book(book_type:str) -&gt; Book: if book_type == &#34;Funny Comic&#34;: book = FunnyComics() elif book_type == &#34;Adventure Comic&#34;: book = AdventureComics() print(book.content()) print(book.cost()) if __name__ == &#39;__main__&#39;: buy_book(&#34;Funny Comic&#34;) buy_book(&#34;Adventure Comic&#34;) 但是會發現當漫畫的種類越來越多的時候，buy_book 內的邏輯會越來越多，並且會一直需要改動 buy_book 這個 function。\n">
 <meta property='og:url' content='https://example.com/post/design-pattern-factory/'>
 <meta property='og:site_name' content='Jack&#39;s Note'>

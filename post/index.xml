@@ -6,7 +6,304 @@
         <description>Recent content in Posts on Jack&#39;s Note</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-tw</language>
-        <lastBuildDate>Thu, 22 May 2025 11:17:31 +0800</lastBuildDate><atom:link href="https://example.com/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Tue, 03 Jun 2025 17:05:01 +0800</lastBuildDate><atom:link href="https://example.com/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Database Replication</title>
+        <link>https://example.com/post/database-replication/</link>
+        <pubDate>Tue, 03 Jun 2025 17:05:01 +0800</pubDate>
+        
+        <guid>https://example.com/post/database-replication/</guid>
+        <description>&lt;h2 id=&#34;資料庫複寫database-replication&#34;&gt;資料庫複寫(Database Replication)
+&lt;/h2&gt;&lt;p&gt;指的是將資料庫內的資料，複製到不同的資料庫實體上。&lt;/p&gt;
+&lt;p&gt;等於是說將資料備份到不同的資料庫上，這樣做的好處是，當一台機器壞掉時，還有其他台機器存有資料。&lt;/p&gt;
+&lt;p&gt;例如異地備份，就是將資料存放到不同地點的機器上，來避免天災、人禍導致的資料損失。
+另外是可以分配讀取查詢到複數的機器上，提高讀取效率。&lt;/p&gt;
+&lt;p&gt;但是分配讀取到不同的資料庫，就需要考慮到寫入是否只能限定哪幾台資料庫，否則可能提升讀取效率卻也會造成資料不一致的問題。&lt;/p&gt;
+&lt;h2 id=&#34;主從機制master-slave&#34;&gt;主從機制(Master Slave)
+&lt;/h2&gt;&lt;p&gt;主從機制是常見的一種資料庫架構模式，將一個資料庫伺服器設為主資料庫(Master)，將其他多個資料庫伺服器設定為從資料庫(Slave)。&lt;/p&gt;
+&lt;h3 id=&#34;主資料庫master&#34;&gt;主資料庫(Master):
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;負責所有的資料寫入。&lt;/li&gt;
+&lt;li&gt;將資料變更記錄到log(e.g. mysql binlog)。
+&lt;ul&gt;
+&lt;li&gt;以 mysql 的 binlog 來說，主資料庫是將變更資料的事件寫到 binlog，從資料庫再向主資料庫 pull binlog ，並根據 binlog 中的事件 replay 操作來更新從資料庫內的資料。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;從資料庫slave&#34;&gt;從資料庫(Slave):
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;不能進行資料寫入。&lt;/li&gt;
+&lt;li&gt;用於資料讀取，分散資料讀取的負擔。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;優點&#34;&gt;優點:
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;分散讀取的查詢到不同的資料庫，可以提高查詢的效率。&lt;/li&gt;
+&lt;li&gt;當其中一台資料庫出現問題時，可以不用擔心資料遺失，或長時間無法使用服務。
+&lt;ul&gt;
+&lt;li&gt;主資料庫出現問題時，可以將從資料庫轉換為主資料庫。&lt;/li&gt;
+&lt;li&gt;從資料庫出現問題，當只有一台時，可以先將讀取操作導向主資料庫。&lt;/li&gt;
+&lt;li&gt;若有多台從資料庫，則先導向其他正常資料庫。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;使用-mysql-建立主從式架構&#34;&gt;使用 mysql 建立主從式架構
+&lt;/h2&gt;&lt;p&gt;可以參考我自己建立的&lt;a class=&#34;link&#34; href=&#34;https://github.com/jacketex894/System-design/tree/main/database_replication&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;例子&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;以下會以我自己的範例結構做說明。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;├── docker-compose.yml
+├── master-database
+│   ├── Dockerfile
+│   ├── init.sql
+│   ├── my.cnf
+└── slave-database
+    ├── Dockerfile
+    ├── my.cnf
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;這個結構中將主資料庫放在 master-database，從資料庫放在 slave-database，master-datase 跟 slave-database 會各自建立容器，並使用 docker compose 做管理。&lt;/p&gt;
+&lt;p&gt;可以先 clone 下來後，執行 docker compose up 後在跟著以下說明進行。&lt;/p&gt;
+&lt;h3 id=&#34;docker-composeyml&#34;&gt;docker-compose.yml
+&lt;/h3&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;services:
+  mysql-master:
+    build: ./master-database # 使用指定目錄建構映像
+    container_name: mysql-master # 指定容器名稱
+    ports:
+      # 指定port，要注意的是 mysql default 3306，這裡是將 mysql 修改後的 port 映射到主機的3307
+      - &amp;#34;3307:3307&amp;#34; 
+    environment:
+      # 設定 mysql 密碼為環境變數，需搭配 master-database/Dockerfile 
+      MYSQL_ROOT_PASSWORD: test 
+    # 設定掛載資料夾
+    # mysql 目的是為了重啟容器不遺失資料
+    # init.sql 是初始化資料庫時建立 user_db 跟 table users
+    # replication 為了備份資料用
+    volumes:
+      - ./master-database/mysql:/var/lib/mysql
+      - ./master-database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./master-database/replication:/replication
+    # 加入 docker 網路跟 slave 溝通
+    networks:
+      - mysqlnet
+
+  mysql-slave:
+    build: ./slave-database # 使用指定目錄建構映像
+    container_name: mysql-slave # 指定容器名稱
+    # 指定port，要注意的是 mysql default 3306，這裡是將 mysql 修改後的 port 映射到主機的3308
+    ports:
+      - &amp;#34;3308:3308&amp;#34;
+    environment:
+      # 設定 mysql 密碼為環境變數，需搭配 slave-database/Dockerfile
+      MYSQL_ROOT_PASSWORD: test
+    # 設定掛載資料夾
+    # mysql 目的是為了重啟容器不遺失資料
+    # replication 為了放 master 的備份資料用
+    volumes:
+      - ./slave-database/mysql:/var/lib/mysql
+      - ./slave-database/replication:/replication
+    # 加入 docker 網路跟 slave 溝通
+    networks:
+      - mysqlnet
+
+networks:
+  mysqlnet:
+    driver: bridge
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;initsql&#34;&gt;init.sql
+&lt;/h3&gt;&lt;p&gt;設想可能在建立主從式架構前，都是只使用一個資料庫來存取資料，但是不夠應付系統需求了，需要建立主從式架構來分散流量。&lt;/p&gt;
+&lt;p&gt;所以在我的例子中，可以在 master-database 資料夾中，看到 init.sql。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;CREATE DATABASE user_db ;
+USE user_db;
+CREATE TABLE users(
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_name VARCHAR(255)  UNIQUE NOT NULL,
+    mail VARCHAR(255) UNIQUE NOT NULL
+);
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;目的是為了模擬在設立主從式架構前就有建立 table。&lt;/p&gt;
+&lt;p&gt;在設定主從式架構前，如果有資料的話，需要主動備份到從資料庫。&lt;/p&gt;
+&lt;p&gt;因為從資料庫不會同步設定主從式架構前的資料。&lt;/p&gt;
+&lt;p&gt;這有可能導致 master 有 table users，並且插入了一筆資料。&lt;/p&gt;
+&lt;p&gt;但是 slave 並沒有 table users，卻跟著 binlog 中的事件 replay，導致錯誤。&lt;/p&gt;
+&lt;p&gt;master 跟 slave 的 replication 掛載資料夾就是為了使用在將主資料庫的資料先備份到從資料庫用的。&lt;/p&gt;
+&lt;p&gt;要如何備份會在後續步驟講解，也可以試試沒有備份時直接設定主從，查看在主資料庫插入一筆資料後，從資料庫會報什麼錯誤。&lt;/p&gt;
+&lt;p&gt;可以閱讀 &lt;a class=&#34;link&#34; href=&#34;https://dev.mysql.com/doc/refman/9.3/en/replication-implementation.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Replication Implementation&lt;/a&gt; 了解 replication 更詳細的內容。&lt;/p&gt;
+&lt;h3 id=&#34;mycnf&#34;&gt;my.cnf
+&lt;/h3&gt;&lt;p&gt;以 master-database/my.cnf 內容來說明&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;[mysqld]
+port=3307
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;將 default 的 port 3306 改成 3307，也可以不設定，default 會為 3306&lt;/p&gt;
+&lt;h3 id=&#34;dockerfile&#34;&gt;Dockerfile
+&lt;/h3&gt;&lt;p&gt;以 master-database/Dockerfile 內容來說明&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;FROM mysql:8.0
+#將 docker compose 設定環境的密碼設定為 sql 的 密碼
+ENV MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+
+#將設定套用到容器內的 mysql  資料庫
+COPY my.cnf /etc/mysql/my.cnf
+&lt;/code&gt;&lt;/pre&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;設定主資料庫&lt;/p&gt;
+&lt;p&gt;首先需要設定 my.cnf，新增以下內容，或著也可以直接使用範例中的 my.cnf 移除掉註解。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# 設定 server 唯一id
+server-id=1
+# 設定 binlog 檔案最大容量
+max_binlog_size=100M
+# 設定記錄檔案名稱
+log_bin = mysql-bin
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;將修改後的內容新增到容器內，因為範例建立的容器沒有 vi 或是 nano。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;docker cp ./my.cnf mysql-master:/etc/mysql/my.cnf
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;重啟容器套用設定。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;docker restart mysql-master
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;為了繼續設定，要進入到容器內。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;docker exec -it mysql-master /bin/bash
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;進入到 mysql 內。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mysql -u root -p
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然後輸入密碼，如果是使用範例的話，密碼是 test。&lt;/p&gt;
+&lt;p&gt;以下指令 mysql&amp;gt; 表示進入 mysql 內下達的指令，實際輸入時請忽略。&lt;/p&gt;
+&lt;p&gt;此時執行&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mysql&amp;gt; SHOW DATABASES;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;應該會看到，事先建立好的user_db。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;+--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
+| user_db            |
++--------------------+
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;建立給從資料庫使用的使用者，並指定使用 SHA-256 來加密及驗證密碼&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mysql&amp;gt; CREATE USER &amp;#39;second&amp;#39;@&amp;#39;%&amp;#39; IDENTIFIED WITH caching_sha2_password BY &amp;#39;test&amp;#39;;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;設定使用者的權限。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mysql&amp;gt; GRANT REPLICATION SLAVE ON *.* TO &amp;#39;second&amp;#39;@&amp;#39;%&amp;#39;;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;重新載入權限，mysql 才能套用上面所設定的使用者權限。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mysql&amp;gt; FLUSH PRIVILEGES;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;確認設定是否生效。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mysql&amp;gt; SHOW MASTER STATUS;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;應該會看到類似以下的輸出結果。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;+------------------+----------+--------------+------------------+-------------------+
+| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
++------------------+----------+--------------+------------------+-------------------+
+| mysql-bin.000001 |      860 |              |                  |                   |
++------------------+----------+--------------+------------------+-------------------+
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;請記下 File 跟 position 的內容，會在從資料庫的設定使用到。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;備份主資料庫資料到從資料庫
+先將 DB 設定為 read only，如果是正在線上的系統，此舉會影響到所有寫入功能，務必小心。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mysql&amp;gt; FLUSH TABLES WITH READ LOCK;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;退出 mysql 到 master-sql 的容器下達指令，備份資料。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mysqldump -uroot -p  --all-databases &amp;gt; replication/master.sql
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;會要求輸入密碼，密碼是 test。&lt;/p&gt;
+&lt;p&gt;在容器外，將 master-database 內的 replication 的備份資料複製到 slave-database 底下。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;sudo cp master-database/replication/master.sql slave-database/replication/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Q: 為什麼要額外掛載 replication?&lt;/p&gt;
+&lt;p&gt;A: 額外掛載 replication 是為了備份資料的移轉，也可以透過其他的方式將檔案移道從資料庫底下，並不限制一定只能照此方法執行。&lt;/p&gt;
+&lt;p&gt;進入到從資料庫的容器內。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;docker exec -it mysql-slave /bin/bash
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;將備份的資料匯入到從資料庫內，也可以看一下 master.sql 的內容，會發現裡面其實是 SQL 指令的腳本，所以這個動作其實是在從資料庫上 replay 主資料庫的操作。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mysql -u root -p --default-character-set=utf8 &amp;lt; replication/master.sql
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;會要求輸入密碼，密碼是 test。&lt;/p&gt;
+&lt;p&gt;進入到 mysql 內。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mysql -u root -p
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然後輸入密碼，如果是使用範例的話，密碼是 test。&lt;/p&gt;
+&lt;p&gt;此時執行&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mysql&amp;gt; SHOW DATABASES;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;會看到，成功備份了主資料庫的 user_db。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;+--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
+| user_db            |
++--------------------+
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;設定從資料庫&lt;/p&gt;
+&lt;p&gt;首先需要設定 my.cnf，新增以下內容，或著也可以直接使用範例中的 my.cnf 移除掉註解。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# 設定 server 唯一id
+server-id=2
+# 設定只能讀取
+read_only=ON
+# 設定連 root 也只能讀取
+super_read_only=ON
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;super_read_only&lt;/code&gt; 這項設定端看使用者需求，如果只設定 &lt;code&gt;read_only&lt;/code&gt; 只會阻擋普通使用者的寫入，並不會阻擋 root 的寫入。&lt;/p&gt;
+&lt;p&gt;將修改後的內容新增到容器內，因為範例建立的容器沒有 vi 或是 nano。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;docker cp ./my.cnf mysql-slave:/etc/mysql/my.cnf
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;重啟容器套用設定。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;docker restart mysql-slave
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;進入到 mysql 內。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mysql -u root -p
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然後輸入密碼，如果是使用範例的話，密碼是 test。&lt;/p&gt;
+&lt;p&gt;根據 &lt;code&gt;1. 設定主資料庫&lt;/code&gt; 紀錄的內容設定&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mysql&amp;gt; CHANGE MASTER TO
+MASTER_HOST=&amp;#39;mysql-master&amp;#39;,
+MASTER_PORT=3307,
+MASTER_USER=&amp;#39;second&amp;#39;,
+MASTER_PASSWORD=&amp;#39;test&amp;#39;,
+MASTER_LOG_FILE=&amp;#39;mysql-bin.000001&amp;#39;,
+MASTER_LOG_POS=860,
+GET_MASTER_PUBLIC_KEY = 1;
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;MASTER_HOST : 是設定主資料庫的ip，但這裡是使用docker-compose內的網路，所以根據 service 名稱設定。&lt;/li&gt;
+&lt;li&gt;MASTER_PORT : 設定主資料的port，如果沒有設定，預設是走3306，所以如果沒有修改主資料庫的 port 是不用設定此項。&lt;/li&gt;
+&lt;li&gt;MASTER_USER : 在 &lt;code&gt;1. 設定主資料庫&lt;/code&gt; 的主資料庫中設定給從資料庫使用的使用者。&lt;/li&gt;
+&lt;li&gt;MASTER_PASSWORD : 在 &lt;code&gt;1. 設定主資料庫&lt;/code&gt; 的主資料庫中設定給從資料庫使用的使用者密碼。&lt;/li&gt;
+&lt;li&gt;MASTER_LOG_FILE : 在 &lt;code&gt;1. 設定主資料庫&lt;/code&gt; &lt;code&gt;SHOW MASTER STATUS&lt;/code&gt; 顯示的 File，指定從哪個 binary log 檔案開始同步。&lt;/li&gt;
+&lt;li&gt;MASTER_LOG_POS : 在 &lt;code&gt;1. 設定主資料庫&lt;/code&gt; &lt;code&gt;SHOW MASTER STATUS&lt;/code&gt; 顯示的 Position，指定 binlog 中的 offset 位置，從該位置開始複製資料。&lt;/li&gt;
+&lt;li&gt;GET_MASTER_PUBLIC_KEY : 設定啟用 RSA 公鑰來交換密碼。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;更詳細的設定可以參考 : &lt;a class=&#34;link&#34; href=&#34;https://dev.mysql.com/doc/refman/8.0/en/change-master-to.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;CHANGE MASTER TO Statement&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;啟動從伺服器的同步機制&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mysql&amp;gt; START SLAVE;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;要注意的是 SQL 版本 如果是 8.0.22 以上的話，&lt;code&gt;START SLAVE&lt;/code&gt; 被改為 &lt;code&gt;START REPLICA&lt;/code&gt;，所以需要注意 SQL 版本。&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://dev.mysql.com/doc/refman/8.0/en/start-slave.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;詳細請參考&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;確認從伺服器的狀態&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mysql&amp;gt; SHOW SLAVE STATUS\G;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;看到以下內容顯示 YES 表示成功了。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;Slave_IO_Running: Yes
+Slave_SQL_Running: Yes
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;設定主資料庫
+記得要解除 &lt;code&gt;2. 備份主資料庫資料到從資料庫&lt;/code&gt; 主資料庫 的 read only。
+&lt;code&gt;mysql&amp;gt; UNLOCK TABLES;&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;可以嘗試在主資料庫 insert 一筆資料，確認從資料庫是否也有更新
+```
+mysql&amp;gt; USE user_db;
+INSERT INTO users (user_name, mail) VALUES (&#39;test&#39;, &#39;test@mail.com&#39;);
+SELECT * FROM users;
+```
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;參考&#34;&gt;參考:
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;內行人才知道的系統設計面試指南&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://homuchen.com/posts/what-and-why-database-replication-advantage-and-disadvantage/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://homuchen.com/posts/what-and-why-database-replication-advantage-and-disadvantage/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://ithelp.ithome.com.tw/m/articles/10267454&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://ithelp.ithome.com.tw/m/articles/10267454&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://medium.com/dean-lin/%E6%89%8B%E6%8A%8A%E6%89%8B%E5%B8%B6%E4%BD%A0%E5%AF%A6%E4%BD%9C-mysql-master-slave-replication-16d0a0fa1d04&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://medium.com/dean-lin/%E6%89%8B%E6%8A%8A%E6%89%8B%E5%B8%B6%E4%BD%A0%E5%AF%A6%E4%BD%9C-mysql-master-slave-replication-16d0a0fa1d04&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.toright.com/posts/5062/mysql-replication-%E4%B8%BB%E5%BE%9E%E5%BC%8F%E6%9E%B6%E6%A7%8B%E8%A8%AD%E5%AE%9A%E6%95%99%E5%AD%B8&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://blog.toright.com/posts/5062/mysql-replication-%E4%B8%BB%E5%BE%9E%E5%BC%8F%E6%9E%B6%E6%A7%8B%E8%A8%AD%E5%AE%9A%E6%95%99%E5%AD%B8&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://ithelp.ithome.com.tw/articles/10255421&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://ithelp.ithome.com.tw/articles/10255421&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://dev.mysql.com/doc/refman/9.3/en/replication-implementation.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://dev.mysql.com/doc/refman/9.3/en/replication-implementation.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://dev.mysql.com/doc/refman/8.0/en/replication-howto.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://dev.mysql.com/doc/refman/8.0/en/replication-howto.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://dev.mysql.com/doc/refman/8.0/en/change-master-to.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://dev.mysql.com/doc/refman/8.0/en/change-master-to.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://dev.mysql.com/doc/refman/8.4/en/caching-sha2-pluggable-authentication.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://dev.mysql.com/doc/refman/8.4/en/caching-sha2-pluggable-authentication.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://dev.mysql.com/doc/refman/8.0/en/start-slave.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://dev.mysql.com/doc/refman/8.0/en/start-slave.html&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        <item>
         <title>SQL vs NoSQL</title>
         <link>https://example.com/post/sql-vs-nosql/</link>
         <pubDate>Thu, 22 May 2025 11:17:31 +0800</pubDate>

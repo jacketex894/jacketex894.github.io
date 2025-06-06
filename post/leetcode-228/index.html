@@ -6,7 +6,7 @@
 
 <link rel='canonical' href='https://example.com/post/leetcode-228/'>
 
-<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Leetcode 228">
+<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Leetcode 228">
 <meta property='og:description' content="題目 228. Summart Ranges\n給予一個 sorted 過的數字陣列，要求依照給定的數字陣列中的連續數字輸出字串陣列。 e.g. input : [0,1,2,4,5,7] output : [&ldquo;0-&gt;2&rdquo;,&ldquo;4-&gt;5&rdquo;,&ldquo;7&rdquo;]\n數字陣列中連續數字分別為 [0,1,2] [4,5] [7]。 所以根據題意可以拆解成三個區間字串 &ldquo;0 -&gt; 2&rdquo; , &ldquo;4 -&gt; 5&rdquo; , &ldquo;7&rdquo;\n根據題目說明，數字陣列長度可能為 0 ，所以需要考慮此特殊狀況。 input 的每一個元素都是獨立的，並且從小排到大。\nPseudocode 首先，先將應實作邏輯整理出來，好讓後面可以使用不同語言實作。 目的是為了邊學習 go 語言的基本操作。\n先針對特例做處理，當收到一個空陣列的時候，應該回傳一個空陣列，而不是繼續其他操作。\n如果 input 是 空陣列: 回傳空陣列 接下來處理連續數字的邏輯:\n當遍歷 input 的時候，需要確認遍歷的元素是否跟前一個元素是連續的。 如果不連續的話，便產生一個字串放入需回傳的答案陣列。 這裡需要兩個陣列:\ntemp_arr : 用來存放與確認目前遍歷的元素是否是連續數字所使用。 answer : 用來存放要回傳的答案。 # 從第 0 個元素開始存放，迴圈從第 1 個元素開始跟前一個元素比對 初始化 temp_arr 為 [input[0]] 初始化 answer 為空陣列 從第 1 個元素開始，逐一遍歷 input 中的元素: 如果 當前元素 不等於 temp_arr 最後一個元素 + 1: # 表示不連續，需結束目前區間 將 temp_arr 根據題義轉為區間字串並加入 answer 初始化 temp_arr 為 [當前元素] 否則: 將當前元素加入 temp_arr # 處理最後一段尚未加入的區間 將 temp_arr 根據題義轉為區間字串並加入 answer 回傳 answer 根據題義產生區間字串的過程，由於在遍歷與遍歷完成後都需要使用到，所以另外寫成 function，方便修改。 根據題義產生區間字串會需要連續數字的第 0 個數字 + &ldquo;-&gt;&rdquo; + 最後一個數字。 但是如果如果不連續，只有單一個數字的話，則只要輸出該數字即可。\n">
 <meta property='og:url' content='https://example.com/post/leetcode-228/'>
 <meta property='og:site_name' content='Jack&#39;s Note'>
