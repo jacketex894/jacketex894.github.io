@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-tw" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="題目 347. Top K Frequent Elements\n給予一個數字陣列 nums 跟數字 k ，回傳這個數字陣列中出現的數字頻率前 K 多的數字。 題目有保證 answer 是 unique ， 所以我認為不用考慮到頻率有相等，但剛好在第 K 跟第 K + 1 的狀況。\nPseudocode 初始化一個 frequency map 用來記錄元素出現頻率 從第 0 個元素開始遍歷 nums: 如果元素沒有出現過: 將元素作為 key 在 frequency 中對應 0 將 frequency 中的元素對應的 value + 1，紀錄出現頻率 + 1 根據 frequency 內的 value 去排序對應的 key 出現頻率的多寡 將排序結果中前 K 大的 key 回傳 時間複雜度會根據排序的演算法而有不同，如果是 Python 的 sorted 或 go 的 sort是O(n log n)\n">
-<title>Leetcode 347</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="題目 42. Trapping Rain Water\n題目 給予一組數字陣列長度為n，用來表示海拔高度，詢問在雨後可以累積多少水量．\n解題思路 先將題目給的測資簡化，n 最小可以為１，設想當海拔高度只有一個時，並不會形成坑洞可以積水，所以累積水量為0。\n那有兩個海拔高度的時候，e.g. [1 , 0 , 1]，則如下圖。\n範例1 可以看到，累積水量為1，那對於程式來說是否是使用 for 迴圈往右找到至少有海拔高度即可？\n無論右邊的高度如何只要不為0，累積水量=min(左邊海拔高度,右邊海拔高度) * 右邊海拔位置 - 左邊海拔位置？\n以這個例子來說是 min(1,1) * 2 - 0 - 1，之所以 -1 是因為實際存水的是中間空格位置。\n似乎只要 for loop 每個海拔位置，並且跟下一個海拔位置比較就好？\nPseudocode-1 初始化answer = 0 初始化left = 0，用來表示左邊海拔高度位置 從第1個海拔位置開始，遍歷海拔高度： 如果遍歷到的位置的海拔大於0: answer += min(左邊海拔高度,遍歷到的海拔高度) * 遍歷到的海拔高度 - 左邊海拔高度 - 1 更新左邊海拔高度=遍歷到的海拔高度 但是這個方法沒有考慮到中間有其他海拔高度，當中間有其他海拔就不能成立。\n看看下個範例，[2,0,1,0,2] 範例2 根據 Pseudocode-1 的算法會得到2，會忽略掉高度1~2的所有累積水量。\n這時轉換思考，是否當左邊最高海拔高度 &gt;= 最右邊海拔高度的時候，可以利用左邊最高海拔高度減去中間所有的海拔高度得到累積水量？\n">
+<title>Leetcode 42</title>
 
-<link rel='canonical' href='https://example.com/post/leetcode-347/'>
+<link rel='canonical' href='https://example.com/post/leetcode-42/'>
 
-<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Leetcode 347">
-<meta property='og:description' content="題目 347. Top K Frequent Elements\n給予一個數字陣列 nums 跟數字 k ，回傳這個數字陣列中出現的數字頻率前 K 多的數字。 題目有保證 answer 是 unique ， 所以我認為不用考慮到頻率有相等，但剛好在第 K 跟第 K + 1 的狀況。\nPseudocode 初始化一個 frequency map 用來記錄元素出現頻率 從第 0 個元素開始遍歷 nums: 如果元素沒有出現過: 將元素作為 key 在 frequency 中對應 0 將 frequency 中的元素對應的 value + 1，紀錄出現頻率 + 1 根據 frequency 內的 value 去排序對應的 key 出現頻率的多寡 將排序結果中前 K 大的 key 回傳 時間複雜度會根據排序的演算法而有不同，如果是 Python 的 sorted 或 go 的 sort是O(n log n)\n">
-<meta property='og:url' content='https://example.com/post/leetcode-347/'>
+<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Leetcode 42">
+<meta property='og:description' content="題目 42. Trapping Rain Water\n題目 給予一組數字陣列長度為n，用來表示海拔高度，詢問在雨後可以累積多少水量．\n解題思路 先將題目給的測資簡化，n 最小可以為１，設想當海拔高度只有一個時，並不會形成坑洞可以積水，所以累積水量為0。\n那有兩個海拔高度的時候，e.g. [1 , 0 , 1]，則如下圖。\n範例1 可以看到，累積水量為1，那對於程式來說是否是使用 for 迴圈往右找到至少有海拔高度即可？\n無論右邊的高度如何只要不為0，累積水量=min(左邊海拔高度,右邊海拔高度) * 右邊海拔位置 - 左邊海拔位置？\n以這個例子來說是 min(1,1) * 2 - 0 - 1，之所以 -1 是因為實際存水的是中間空格位置。\n似乎只要 for loop 每個海拔位置，並且跟下一個海拔位置比較就好？\nPseudocode-1 初始化answer = 0 初始化left = 0，用來表示左邊海拔高度位置 從第1個海拔位置開始，遍歷海拔高度： 如果遍歷到的位置的海拔大於0: answer += min(左邊海拔高度,遍歷到的海拔高度) * 遍歷到的海拔高度 - 左邊海拔高度 - 1 更新左邊海拔高度=遍歷到的海拔高度 但是這個方法沒有考慮到中間有其他海拔高度，當中間有其他海拔就不能成立。\n看看下個範例，[2,0,1,0,2] 範例2 根據 Pseudocode-1 的算法會得到2，會忽略掉高度1~2的所有累積水量。\n這時轉換思考，是否當左邊最高海拔高度 &gt;= 最右邊海拔高度的時候，可以利用左邊最高海拔高度減去中間所有的海拔高度得到累積水量？\n">
+<meta property='og:url' content='https://example.com/post/leetcode-42/'>
 <meta property='og:site_name' content='Jack&#39;s Note'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-05-06T21:07:33&#43;08:00'/><meta property='article:modified_time' content='2025-05-06T21:07:33&#43;08:00'/>
-<meta name="twitter:title" content="Leetcode 347">
-<meta name="twitter:description" content="題目 347. Top K Frequent Elements\n給予一個數字陣列 nums 跟數字 k ，回傳這個數字陣列中出現的數字頻率前 K 多的數字。 題目有保證 answer 是 unique ， 所以我認為不用考慮到頻率有相等，但剛好在第 K 跟第 K + 1 的狀況。\nPseudocode 初始化一個 frequency map 用來記錄元素出現頻率 從第 0 個元素開始遍歷 nums: 如果元素沒有出現過: 將元素作為 key 在 frequency 中對應 0 將 frequency 中的元素對應的 value + 1，紀錄出現頻率 + 1 根據 frequency 內的 value 去排序對應的 key 出現頻率的多寡 將排序結果中前 K 大的 key 回傳 時間複雜度會根據排序的演算法而有不同，如果是 Python 的 sorted 或 go 的 sort是O(n log n)\n">
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-06-11T18:04:01&#43;08:00'/><meta property='article:modified_time' content='2025-06-11T18:04:01&#43;08:00'/>
+<meta name="twitter:title" content="Leetcode 42">
+<meta name="twitter:description" content="題目 42. Trapping Rain Water\n題目 給予一組數字陣列長度為n，用來表示海拔高度，詢問在雨後可以累積多少水量．\n解題思路 先將題目給的測資簡化，n 最小可以為１，設想當海拔高度只有一個時，並不會形成坑洞可以積水，所以累積水量為0。\n那有兩個海拔高度的時候，e.g. [1 , 0 , 1]，則如下圖。\n範例1 可以看到，累積水量為1，那對於程式來說是否是使用 for 迴圈往右找到至少有海拔高度即可？\n無論右邊的高度如何只要不為0，累積水量=min(左邊海拔高度,右邊海拔高度) * 右邊海拔位置 - 左邊海拔位置？\n以這個例子來說是 min(1,1) * 2 - 0 - 1，之所以 -1 是因為實際存水的是中間空格位置。\n似乎只要 for loop 每個海拔位置，並且跟下一個海拔位置比較就好？\nPseudocode-1 初始化answer = 0 初始化left = 0，用來表示左邊海拔高度位置 從第1個海拔位置開始，遍歷海拔高度： 如果遍歷到的位置的海拔大於0: answer += min(左邊海拔高度,遍歷到的海拔高度) * 遍歷到的海拔高度 - 左邊海拔高度 - 1 更新左邊海拔高度=遍歷到的海拔高度 但是這個方法沒有考慮到中間有其他海拔高度，當中間有其他海拔就不能成立。\n看看下個範例，[2,0,1,0,2] 範例2 根據 Pseudocode-1 的算法會得到2，會忽略掉高度1~2的所有累積水量。\n這時轉換思考，是否當左邊最高海拔高度 &gt;= 最右邊海拔高度的時候，可以利用左邊最高海拔高度減去中間所有的海拔高度得到累積水量？\n">
     </head>
     <body class="
     article-page
@@ -202,7 +202,7 @@
 
     <div class="article-title-wrapper">
         <h2 class="article-title">
-            <a href="/post/leetcode-347/">Leetcode 347</a>
+            <a href="/post/leetcode-42/">Leetcode 42</a>
         </h2>
     
         
@@ -224,7 +224,7 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published">May 06, 2025</time>
+                <time class="article-time--published">Jun 11, 2025</time>
             </div>
         
 
@@ -239,7 +239,7 @@
 
 
                 <time class="article-time--reading">
-                    閱讀時間: 1 分鐘
+                    閱讀時間: 2 分鐘
                 </time>
             </div>
         
@@ -255,54 +255,127 @@
     
     
     <h2 id="題目">題目
-</h2><p><a class="link" href="https://leetcode.com/problems/top-k-frequent-elements"  target="_blank" rel="noopener"
-    >347. Top K Frequent Elements</a></p>
-<p>給予一個數字陣列 nums 跟數字 k ，回傳這個數字陣列中出現的數字頻率前 K 多的數字。
-題目有保證 answer 是 unique ， 所以我認為不用考慮到頻率有相等，但剛好在第 K 跟第 K + 1 的狀況。</p>
-<h2 id="pseudocode">Pseudocode
-</h2><pre tabindex="0"><code>初始化一個 frequency map 用來記錄元素出現頻率
-從第 0 個元素開始遍歷 nums:
-    如果元素沒有出現過:
-        將元素作為 key 在 frequency 中對應 0
-    將 frequency 中的元素對應的 value + 1，紀錄出現頻率 + 1 
-根據 frequency 內的 value 去排序對應的 key 出現頻率的多寡
-將排序結果中前 K 大的 key 回傳
-</code></pre><p>時間複雜度會根據排序的演算法而有不同，如果是 Python 的 sorted 或 go 的 sort是O(n log n)</p>
-<h2 id="python">Python
-</h2><pre tabindex="0"><code>class Solution:
-    def topKFrequent(self, nums: List[int], k: int) -&gt; List[int]:
-        frequency = {}
-        for num in nums:
-            if num not in frequency:
-                frequency[num] = 0
-            frequency[num] += 1
-        
-        answer = sorted(frequency.keys(),key = lambda x: frequency[x],reverse=True)
-        return answer[:k]
-</code></pre><h3 id="go">Go
-</h3><pre tabindex="0"><code>import (
-    &#34;fmt&#34;
-    &#34;sort&#34;
-)
+</h2><p><a class="link" href="https://leetcode.com/problems/trapping-rain-water"  target="_blank" rel="noopener"
+    >42. Trapping Rain Water</a></p>
+<h2 id="題目-1">題目
+</h2><p>給予一組數字陣列長度為n，用來表示海拔高度，詢問在雨後可以累積多少水量．</p>
+<h2 id="解題思路">解題思路
+</h2><p>先將題目給的測資簡化，n 最小可以為１，設想當海拔高度只有一個時，並不會形成坑洞可以積水，所以累積水量為0。</p>
+<p>那有兩個海拔高度的時候，e.g. [1 , 0 , 1]，則如下圖。</p>
+<p><figure><img src="/post/leetcode-42/images/0.png" width="90%"><figcaption>
+      <h4>範例1</h4>
+    </figcaption>
+</figure>
 
-func topKFrequent(nums []int, k int) []int {
-    frequency :=  map[int]int{}
-    for index:=0;index &lt; len(nums);index += 1{
-        if _,ok := frequency[nums[index]]; !ok{
-            frequency[nums[index]] = 0
+可以看到，累積水量為1，那對於程式來說是否是使用 for 迴圈往右找到至少有海拔高度即可？</p>
+<p>無論右邊的高度如何只要不為0，累積水量=min(左邊海拔高度,右邊海拔高度) * 右邊海拔位置 - 左邊海拔位置？</p>
+<p>以這個例子來說是 min(1,1) * 2 - 0 - 1，之所以 -1 是因為實際存水的是中間空格位置。</p>
+<p>似乎只要 for loop 每個海拔位置，並且跟下一個海拔位置比較就好？</p>
+<h3 id="pseudocode-1">Pseudocode-1
+</h3><pre tabindex="0"><code>初始化answer = 0
+初始化left = 0，用來表示左邊海拔高度位置
+從第1個海拔位置開始，遍歷海拔高度：
+  如果遍歷到的位置的海拔大於0:
+    answer += min(左邊海拔高度,遍歷到的海拔高度) * 遍歷到的海拔高度 - 左邊海拔高度 - 1
+    更新左邊海拔高度=遍歷到的海拔高度
+</code></pre><p>但是這個方法沒有考慮到中間有其他海拔高度，當中間有其他海拔就不能成立。</p>
+<p>看看下個範例，[2,0,1,0,2]
+<figure><img src="/post/leetcode-42/images/1.png" width="90%"><figcaption>
+      <h4>範例2</h4>
+    </figcaption>
+</figure>
+
+根據 Pseudocode-1 的算法會得到2，會忽略掉高度1~2的所有累積水量。</p>
+<p>這時轉換思考，是否當左邊最高海拔高度 &gt;= 最右邊海拔高度的時候，可以利用左邊最高海拔高度減去中間所有的海拔高度得到累積水量？</p>
+<h3 id="pseudocode-2">Pseudocode-2
+</h3><pre tabindex="0"><code>初始化answer = 0
+初始化max_left = 0，用來表示左邊最高海拔高度位置
+從第1個海拔位置開始，遍歷海拔高度：
+  #遍歷每個海拔的時候更新左邊最高高度
+  max_left= max(max_left,遍歷到的海拔高度)
+  answer += max_left - 遍歷海拔高度
+</code></pre><p>但這算法依然有問題，只有當最右邊的海拔高度是從右邊看來最高的才成立。</p>
+<p>範例，[3,0,1,0,3,0,2]</p>
+<p><figure><img src="/post/leetcode-42/images/2.png" width="90%"><figcaption>
+      <h4>範例3</h4>
+    </figcaption>
+</figure>
+
+在這個例子中看來,在倒數第2個海拔高度位置的時候會多計算一格累積水量。</p>
+<p>這時思考是否不該只從左邊迴圈看過來更新左邊最高海拔高度，也需要從右邊海拔高度看過來？</p>
+<p>但是什麼條件下該移動左邊什麼時候該移動右邊呢？</p>
+<p>先以左邊來思考，右邊海拔高度必須 &gt;= 左邊海拔高度，才能用左邊海拔高度減去遍歷的高度。</p>
+<p>使用 max_left= max(max_left,遍歷到的海拔高度)，直接來更新左邊最高高度有以下目的:</p>
+<ul>
+<li>當遍歷的高度比左邊最高海拔高度低的時候，不會更新，answer += max_left - 遍歷海拔高度，便可以累積水量。</li>
+<li>當遍歷的高度比左邊最高海拔高度高的時候，更新了，max_left - 遍歷海拔高度 = 0，當先前的最高高度比遍歷的高度低的時候，也不能累積水量。</li>
+</ul>
+<h3 id="pseudocode-3">Pseudocode-3
+</h3><pre tabindex="0"><code>初始化answer = 0
+初始化max_left = 0，用來表示左邊最高海拔高度位置
+初始化max_right = n - 1，用來表示右邊最高海拔高度位置
+從第1個海拔位置開始，遍歷海拔高度：
+  如果 max_right &gt;= max_left:
+    max_left= max(max_left,遍歷到的海拔高度)
+    answer += max_left - 遍歷海拔高度
+</code></pre><p>但這裡又有個問題，該怎麼更新右邊的最高海拔高度？</p>
+<p>轉換想法，以兩個變數分別指向左邊跟右邊海拔位置，從左右開始往中間移動，來遍歷海拔高度。</p>
+<h3 id="pseudocode-4">Pseudocode-4
+</h3><pre tabindex="0"><code>初始化answer = 0
+初始化left = 0 ，用來表示左邊目前遍歷的海拔位置
+初始化right = n - 1，用來表示右邊目前遍歷的海拔位置
+初始化max_left = 海拔高度[0]，用來表示左邊最高海拔高度位置
+初始化max_right = 海拔高度[n - 1]，用來表示右邊最高海拔高度位置
+當 left &lt; right：
+  如果 max_right &gt;= max_left:
+    left + 1 右移到下一個位置
+    max_left = max(max_left,left位置的海拔高度)
+    answer += max_left - left位置的海拔高度
+  否則：
+    right - 1 左移到下一個位置
+    max_right = max(max_right,right位置的海拔高度)
+</code></pre><p>但在這個方法中依然會漏掉倒數第2個海拔高度位置的水量。</p>
+<p>所以從右邊左移的時候也應該要計算累積水量。</p>
+<h3 id="pseudocode-5">Pseudocode-5
+</h3><pre tabindex="0"><code>初始化answer = 0
+初始化left = 0 ，用來表示左邊目前遍歷的海拔位置
+初始化right = n - 1 ，用來表示右邊目前遍歷的海拔位置
+初始化max_left = 海拔高度[0]，用來表示左邊最高海拔高度位置
+初始化max_right = 海拔高度[n - 1]，用來表示右邊最高海拔高度位置
+當 left &lt; right：
+  如果 max_right &gt;= max_left:
+    left + 1 右移到下一個位置
+    max_left = max(max_left,left位置的海拔高度)
+    answer += max_left - left位置的海拔高度
+  否則：
+    right - 1 左移到下一個位置
+    max_right = max(max_right,right位置的海拔高度)
+    answer += max_right - right位置的海拔高度
+回傳 answer
+</code></pre><h2 id="c">C++
+</h2><pre tabindex="0"><code>class Solution {
+public:
+    int trap(vector&lt;int&gt;&amp; height) {
+        int left = 0;
+        int right = height.size() - 1;
+        int left_max = height[left];
+        int right_max = height[right];
+        int answer = 0;
+        while (left &lt; right){
+            if (left_max &lt;= right_max){
+                left ++;
+                left_max = max(left_max,height[left]);
+                answer += left_max - height[left];
+            }
+            else{
+                right --;
+                right_max = max(right_max,height[right]);
+                answer += right_max - height[right];
+            }
         }
-        frequency[nums[index]] += 1
+        return answer;
     }
-    answer := []int{}
-    for number := range frequency{
-        answer = append(answer,number)
-    }
-
-    sort.Slice(answer,func(i,j int) bool{
-        return frequency[answer[i]] &gt; frequency[answer[j]]
-    })
-    return answer[:k]
-}
+};
 </code></pre>
 </section>
 
@@ -327,12 +400,12 @@ func topKFrequent(nums []int, k int) []int {
             
                 
 <article class="">
-    <a href="/post/leetcode-42/">
+    <a href="/post/leetcode-53/">
         
         
 
         <div class="article-details">
-            <h2 class="article-title">Leetcode 42</h2>
+            <h2 class="article-title">Leetcode 53</h2>
         </div>
     </a>
 </article>
@@ -340,12 +413,12 @@ func topKFrequent(nums []int, k int) []int {
             
                 
 <article class="">
-    <a href="/post/leetcode-53/">
+    <a href="/post/leetcode-347/">
         
         
 
         <div class="article-details">
-            <h2 class="article-title">Leetcode 53</h2>
+            <h2 class="article-title">Leetcode 347</h2>
         </div>
     </a>
 </article>

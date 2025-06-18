@@ -476,12 +476,7 @@ ON users.user_name = user_details.user_name;
         <pubDate>Tue, 13 May 2025 00:23:14 +0800</pubDate>
         
         <guid>https://example.com/post/sqlalchemy/</guid>
-        <description>&lt;h2 id=&#34;前言&#34;&gt;前言
-&lt;/h2&gt;&lt;p&gt;學到了 connection pool，想說要來 optimize 自己的 side project。&lt;/p&gt;
-&lt;p&gt;沒想到研究了半天，原本使用的 Sqlalchemy 就已經有內建有做了。&lt;/p&gt;
-&lt;p&gt;因此做個筆記紀錄一下，也給自己一個警惕，比起請 AI 直接開始改寫，不如先去讀一下官方文件，養成閱讀官方文件的習慣。&lt;/p&gt;
-&lt;p&gt;在使用 AI 上也要更小心自己不夠了解的部分，避免被幻覺誤導。&lt;/p&gt;
-&lt;h2 id=&#34;connection-pool&#34;&gt;Connection pool
+        <description>&lt;h2 id=&#34;connection-pool&#34;&gt;Connection pool
 &lt;/h2&gt;&lt;p&gt;每當跟資料庫要求 CRUD 操作時，都需要跟資料庫建立連線、進行操作、關閉連線。
 建立連線跟關閉連線的動作對資料庫來說是很消耗資源的，connection pool 就是為了解決消耗資源的問題。&lt;/p&gt;
 &lt;p&gt;connection pool 相當於連線的快取，程式會事先建立固定的連線數量，當要跟資料庫要求執行操作時，會從 connection pool 中取得已事先建立好的連線，完成操作後再歸還。&lt;/p&gt;

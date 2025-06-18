@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-tw" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Ｍysql Cluster Cluster 利用多台獨立的伺服器或是電腦(節點,Node)，組成集群(cluster)，共同計算或提供一項服務。\n優點 1.高可用性(Availability):資料會複製多份在不同的機器上，即便其中一台節點損壞，也可以持續提供服務。\n2.擴展性(Scalability）): mysql cluster 可以透過新增一個新的節點(可能是一台新的電腦或是伺服器)，來分散流量負擔。\n3.資料一致性(Consistency): mysql cluster 可以維持 ACID 來保證資料一致性。\nReplication mysql cluster 透過同步(synchronous) 的方法來保持資料一致性備份資料到其他節點。\n而與先前筆記的 mysql 的主從式資料庫有所不同的點在於，mysql 的主從式資料庫是透過非同步的方式來備份資料到從資料庫。\n從寫入一筆資料到資料庫來分別兩者的區別\nmysql cluster : 會需要等待所有節點都寫入完成後，寫入才完成。\n若有節點寫入不完成，所有節點會一起 roll back。\nmysql 主從式資料庫 : 當主資料庫寫入後，對於主資料庫來說資料寫入已經完成，並會將該事件記錄到 bin log，再由從資料庫取得 bin log 後 replay 事件同步資料。\n若是從資料庫寫入失敗，主資料庫並不會因此 roll back，而從資料庫則會停止運作，資料維持在寫入失敗的這一刻，不會再更新。 可以參考(database-repliaction)沒有備份主資料庫的資料就設定了主從式會發生的狀況。\nmysql cluster 透過 two-phase commit 的機制來保證資料寫入所有節點。\ntwo-phase commit two-phase commit 是被設計用來處理所有參與節點是否 commit 或是 abort(roll back) transaction 的一種演算法。\n必須滿足以下條件：\n每個節點都要有穩定的儲存空間提供給 write-ahead log。 write-ahead log 指的是所有對 DB 的操作都必須先寫入在此log，才能對 DB 進行變動。 沒有節點會永遠處在崩潰狀態。 所有寫在 write-ahead log 的資料不會因為 node 的崩潰，而遺失或是損壞。 任意兩個節點可以彼此溝通。 需要有一個協調者(coordinator process)，向所有參與節點提出請求，詢問是否要 commit 或是 abort transaction，並根據回應來決定動作。\n">
+<title>Mysql Cluster</title>
+
+<link rel='canonical' href='http://localhost:1313/post/mysql-cluster/'>
+
+<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Mysql Cluster">
+<meta property='og:description' content="Ｍysql Cluster Cluster 利用多台獨立的伺服器或是電腦(節點,Node)，組成集群(cluster)，共同計算或提供一項服務。\n優點 1.高可用性(Availability):資料會複製多份在不同的機器上，即便其中一台節點損壞，也可以持續提供服務。\n2.擴展性(Scalability）): mysql cluster 可以透過新增一個新的節點(可能是一台新的電腦或是伺服器)，來分散流量負擔。\n3.資料一致性(Consistency): mysql cluster 可以維持 ACID 來保證資料一致性。\nReplication mysql cluster 透過同步(synchronous) 的方法來保持資料一致性備份資料到其他節點。\n而與先前筆記的 mysql 的主從式資料庫有所不同的點在於，mysql 的主從式資料庫是透過非同步的方式來備份資料到從資料庫。\n從寫入一筆資料到資料庫來分別兩者的區別\nmysql cluster : 會需要等待所有節點都寫入完成後，寫入才完成。\n若有節點寫入不完成，所有節點會一起 roll back。\nmysql 主從式資料庫 : 當主資料庫寫入後，對於主資料庫來說資料寫入已經完成，並會將該事件記錄到 bin log，再由從資料庫取得 bin log 後 replay 事件同步資料。\n若是從資料庫寫入失敗，主資料庫並不會因此 roll back，而從資料庫則會停止運作，資料維持在寫入失敗的這一刻，不會再更新。 可以參考(database-repliaction)沒有備份主資料庫的資料就設定了主從式會發生的狀況。\nmysql cluster 透過 two-phase commit 的機制來保證資料寫入所有節點。\ntwo-phase commit two-phase commit 是被設計用來處理所有參與節點是否 commit 或是 abort(roll back) transaction 的一種演算法。\n必須滿足以下條件：\n每個節點都要有穩定的儲存空間提供給 write-ahead log。 write-ahead log 指的是所有對 DB 的操作都必須先寫入在此log，才能對 DB 進行變動。 沒有節點會永遠處在崩潰狀態。 所有寫在 write-ahead log 的資料不會因為 node 的崩潰，而遺失或是損壞。 任意兩個節點可以彼此溝通。 需要有一個協調者(coordinator process)，向所有參與節點提出請求，詢問是否要 commit 或是 abort transaction，並根據回應來決定動作。\n">
+<meta property='og:url' content='http://localhost:1313/post/mysql-cluster/'>
+<meta property='og:site_name' content='Jack&#39;s Note'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-06-14T14:19:51&#43;08:00'/><meta property='article:modified_time' content='2025-06-14T14:19:51&#43;08:00'/>
+<meta name="twitter:title" content="Mysql Cluster">
+<meta name="twitter:description" content="Ｍysql Cluster Cluster 利用多台獨立的伺服器或是電腦(節點,Node)，組成集群(cluster)，共同計算或提供一項服務。\n優點 1.高可用性(Availability):資料會複製多份在不同的機器上，即便其中一台節點損壞，也可以持續提供服務。\n2.擴展性(Scalability）): mysql cluster 可以透過新增一個新的節點(可能是一台新的電腦或是伺服器)，來分散流量負擔。\n3.資料一致性(Consistency): mysql cluster 可以維持 ACID 來保證資料一致性。\nReplication mysql cluster 透過同步(synchronous) 的方法來保持資料一致性備份資料到其他節點。\n而與先前筆記的 mysql 的主從式資料庫有所不同的點在於，mysql 的主從式資料庫是透過非同步的方式來備份資料到從資料庫。\n從寫入一筆資料到資料庫來分別兩者的區別\nmysql cluster : 會需要等待所有節點都寫入完成後，寫入才完成。\n若有節點寫入不完成，所有節點會一起 roll back。\nmysql 主從式資料庫 : 當主資料庫寫入後，對於主資料庫來說資料寫入已經完成，並會將該事件記錄到 bin log，再由從資料庫取得 bin log 後 replay 事件同步資料。\n若是從資料庫寫入失敗，主資料庫並不會因此 roll back，而從資料庫則會停止運作，資料維持在寫入失敗的這一刻，不會再更新。 可以參考(database-repliaction)沒有備份主資料庫的資料就設定了主從式會發生的狀況。\nmysql cluster 透過 two-phase commit 的機制來保證資料寫入所有節點。\ntwo-phase commit two-phase commit 是被設計用來處理所有參與節點是否 commit 或是 abort(roll back) transaction 的一種演算法。\n必須滿足以下條件：\n每個節點都要有穩定的儲存空間提供給 write-ahead log。 write-ahead log 指的是所有對 DB 的操作都必須先寫入在此log，才能對 DB 進行變動。 沒有節點會永遠處在崩潰狀態。 所有寫在 write-ahead log 的資料不會因為 node 的崩潰，而遺失或是損壞。 任意兩個節點可以彼此溝通。 需要有一個協調者(coordinator process)，向所有參與節點提出請求，詢問是否要 commit 或是 abort transaction，並根據回應來決定動作。\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切換選單">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/avaster_hu_5bf726200fd24bf8.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Jack&#39;s Note</a></h1>
+            <h2 class="site-description">Trying to do better</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/jacketex894'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>夜晚模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/system-design/" style="background-color: #00AEAE; color: #fff;">
+                System Design
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/mysql-cluster/">Mysql Cluster</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jun 14, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    閱讀時間: 1 分鐘
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="ｍysql-cluster">Ｍysql Cluster
+</h1><h2 id="cluster">Cluster
+</h2><p>利用多台獨立的伺服器或是電腦(節點,Node)，組成集群(cluster)，共同計算或提供一項服務。</p>
+<h3 id="優點">優點
+</h3><p>1.高可用性(Availability):資料會複製多份在不同的機器上，即便其中一台節點損壞，也可以持續提供服務。</p>
+<p>2.擴展性(Scalability）): mysql cluster 可以透過新增一個新的節點(可能是一台新的電腦或是伺服器)，來分散流量負擔。</p>
+<p>3.資料一致性(Consistency): mysql cluster 可以維持 ACID 來保證資料一致性。</p>
+<h3 id="replication">Replication
+</h3><p>mysql cluster 透過同步(synchronous) 的方法來保持資料一致性備份資料到其他節點。</p>
+<p>而與先前筆記的 mysql 的主從式資料庫有所不同的點在於，mysql 的主從式資料庫是透過非同步的方式來備份資料到從資料庫。</p>
+<p>從寫入一筆資料到資料庫來分別兩者的區別</p>
+<ul>
+<li>
+<p>mysql cluster : 會需要等待所有節點都寫入完成後，寫入才完成。</p>
+<p>若有節點寫入不完成，所有節點會一起 roll back。</p>
+</li>
+<li>
+<p>mysql 主從式資料庫 : 當主資料庫寫入後，對於主資料庫來說資料寫入已經完成，並會將該事件記錄到 bin log，再由從資料庫取得 bin log 後 replay 事件同步資料。</p>
+<p>若是從資料庫寫入失敗，主資料庫並不會因此 roll back，而從資料庫則會停止運作，資料維持在寫入失敗的這一刻，不會再更新。
+可以參考(<a class="link" href="/post/database-replication/" >database-repliaction</a>)沒有備份主資料庫的資料就設定了主從式會發生的狀況。</p>
+</li>
+</ul>
+<p>mysql cluster 透過 two-phase commit 的機制來保證資料寫入所有節點。</p>
+<h4 id="two-phase-commit">two-phase commit
+</h4><p>two-phase commit 是被設計用來處理所有參與節點是否 commit 或是 abort(roll back) transaction 的一種演算法。</p>
+<p>必須滿足以下條件：</p>
+<ul>
+<li>每個節點都要有穩定的儲存空間提供給 write-ahead log。
+<ul>
+<li>write-ahead log 指的是所有對 DB 的操作都必須先寫入在此log，才能對 DB 進行變動。</li>
+</ul>
+</li>
+<li>沒有節點會永遠處在崩潰狀態。</li>
+<li>所有寫在  write-ahead log 的資料不會因為 node 的崩潰，而遺失或是損壞。</li>
+<li>任意兩個節點可以彼此溝通。</li>
+</ul>
+<ol>
+<li>
+<p>需要有一個協調者(coordinator process)，向所有參與節點提出請求，詢問是否要 commit 或是 abort transaction，並根據回應來決定動作。</p>
+<p>1-1. 協調者向所有參與節點發出請求確認是否commit transaction，並等待所有參與節點回應。</p>
+<p>1-2. 參與節點執行協調者詢問是否 commit 的 transaction，並記錄到 undo log 以及 redo log。(即便執行了，參與節點也並沒有在執行完 release 資源或lock)</p>
+<p>1-3. 所有參與節點根據執行成功或失敗，回覆是要 commit 或是 abort。</p>
+</li>
+<li>
+<p>協調者根據回應結果決定要 commit 還是 abort transaction，並向所有節點發出 notify。所有節點收到後根據投票決定的結果執行。</p>
+<ul>
+<li>success:</li>
+</ul>
+<ol>
+<li>協調者收到所有參與節點都決定 commit，並向所有參與節點送出訊息要求 commit。</li>
+<li>所有參與節點完成操作後，release 所有資源跟 lock。</li>
+<li>所有參與節點回傳 acknowledgement 給協調者。</li>
+<li>協調者收到所有 acknowledgement 完成 transaction。</li>
+</ol>
+<ul>
+<li>fail:
+當任一節點回覆 abort 或是超時沒有回應</li>
+</ul>
+<ol>
+<li>協調者向所有參與節點發出 roll back 請求</li>
+<li>所有參與節點根據 undo log undo 後，release 資源跟 lock。</li>
+<li>所有參與節點回傳 acknowledgement 給協調者。</li>
+<li>協調者收到所有 acknowledgement 後 undo transaction</li>
+</ol>
+</li>
+</ol>
+<h2 id="參考">參考:
+</h2><p><a class="link" href="https://en.wikipedia.org/wiki/MySQL_Cluster"  target="_blank" rel="noopener"
+    >https://en.wikipedia.org/wiki/MySQL_Cluster</a>
+<a class="link" href="https://en.wikipedia.org/wiki/Two-phase_commit_protocol"  target="_blank" rel="noopener"
+    >https://en.wikipedia.org/wiki/Two-phase_commit_protocol</a>
+<a class="link" href="https://en.wikipedia.org/wiki/Write-ahead_logging"  target="_blank" rel="noopener"
+    >https://en.wikipedia.org/wiki/Write-ahead_logging</a>
+<a class="link" href="https://www.cc.ntu.edu.tw/chinese/epaper/0037/20160620_3707.html"  target="_blank" rel="noopener"
+    >https://www.cc.ntu.edu.tw/chinese/epaper/0037/20160620_3707.html</a></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相關文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/database-replication/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Database Replication</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/sql-vs-nosql/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">SQL vs NoSQL</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/sqlalchemy/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Sqlalchemy</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/jwt/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">JWT Note</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2025 Jack&#39;s Note
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 建立 <br />
+        主題 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 設計
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.f7cd3f38cb3a232f30afc63001c7b35016dd7ce84029d841eef37b1873c1c01a.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
