@@ -5,11 +5,17 @@
     <loc>https://example.com/</loc>
     <lastmod>2025-06-14T14:19:51+08:00</lastmod>
   </url><url>
+    <loc>https://example.com/categories/</loc>
+    <lastmod>2025-06-14T14:19:51+08:00</lastmod>
+  </url><url>
+    <loc>https://example.com/post/mysql-cluster/</loc>
+    <lastmod>2025-06-14T14:19:51+08:00</lastmod>
+  </url><url>
     <loc>https://example.com/post/</loc>
     <lastmod>2025-06-14T14:19:51+08:00</lastmod>
   </url><url>
-    <loc>https://example.com/categories/</loc>
-    <lastmod>2025-06-11T18:04:01+08:00</lastmod>
+    <loc>https://example.com/categories/system-design/</loc>
+    <lastmod>2025-06-14T14:19:51+08:00</lastmod>
   </url><url>
     <loc>https://example.com/categories/coding/</loc>
     <lastmod>2025-06-11T18:04:01+08:00</lastmod>
@@ -18,9 +24,6 @@
     <lastmod>2025-06-11T18:04:01+08:00</lastmod>
   </url><url>
     <loc>https://example.com/post/database-replication/</loc>
-    <lastmod>2025-06-03T17:05:01+08:00</lastmod>
-  </url><url>
-    <loc>https://example.com/categories/system-design/</loc>
     <lastmod>2025-06-03T17:05:01+08:00</lastmod>
   </url><url>
     <loc>https://example.com/post/sql-vs-nosql/</loc>

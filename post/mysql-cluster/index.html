@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-tw" dir="ltr">
-    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+    <head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Ｍysql Cluster Cluster 利用多台獨立的伺服器或是電腦(節點,Node)，組成集群(cluster)，共同計算或提供一項服務。\n優點 1.高可用性(Availability):資料會複製多份在不同的機器上，即便其中一台節點損壞，也可以持續提供服務。\n2.擴展性(Scalability）): mysql cluster 可以透過新增一個新的節點(可能是一台新的電腦或是伺服器)，來分散流量負擔。\n3.資料一致性(Consistency): mysql cluster 可以維持 ACID 來保證資料一致性。\nReplication mysql cluster 透過同步(synchronous) 的方法來保持資料一致性備份資料到其他節點。\n而與先前筆記的 mysql 的主從式資料庫有所不同的點在於，mysql 的主從式資料庫是透過非同步的方式來備份資料到從資料庫。\n從寫入一筆資料到資料庫來分別兩者的區別\nmysql cluster : 會需要等待所有節點都寫入完成後，寫入才完成。\n若有節點寫入不完成，所有節點會一起 roll back。\nmysql 主從式資料庫 : 當主資料庫寫入後，對於主資料庫來說資料寫入已經完成，並會將該事件記錄到 bin log，再由從資料庫取得 bin log 後 replay 事件同步資料。\n若是從資料庫寫入失敗，主資料庫並不會因此 roll back，而從資料庫則會停止運作，資料維持在寫入失敗的這一刻，不會再更新。 可以參考(database-repliaction)沒有備份主資料庫的資料就設定了主從式會發生的狀況。\nmysql cluster 透過 two-phase commit 的機制來保證資料寫入所有節點。\ntwo-phase commit two-phase commit 是被設計用來處理所有參與節點是否 commit 或是 abort(roll back) transaction 的一種演算法。\n必須滿足以下條件：\n每個節點都要有穩定的儲存空間提供給 write-ahead log。 write-ahead log 指的是所有對 DB 的操作都必須先寫入在此log，才能對 DB 進行變動。 沒有節點會永遠處在崩潰狀態。 所有寫在 write-ahead log 的資料不會因為 node 的崩潰，而遺失或是損壞。 任意兩個節點可以彼此溝通。 需要有一個協調者(coordinator process)，向所有參與節點提出請求，詢問是否要 commit 或是 abort transaction，並根據回應來決定動作。\n">
 <title>Mysql Cluster</title>
 
-<link rel='canonical' href='http://localhost:1313/post/mysql-cluster/'>
+<link rel='canonical' href='https://example.com/post/mysql-cluster/'>
 
 <link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Mysql Cluster">
 <meta property='og:description' content="Ｍysql Cluster Cluster 利用多台獨立的伺服器或是電腦(節點,Node)，組成集群(cluster)，共同計算或提供一項服務。\n優點 1.高可用性(Availability):資料會複製多份在不同的機器上，即便其中一台節點損壞，也可以持續提供服務。\n2.擴展性(Scalability）): mysql cluster 可以透過新增一個新的節點(可能是一台新的電腦或是伺服器)，來分散流量負擔。\n3.資料一致性(Consistency): mysql cluster 可以維持 ACID 來保證資料一致性。\nReplication mysql cluster 透過同步(synchronous) 的方法來保持資料一致性備份資料到其他節點。\n而與先前筆記的 mysql 的主從式資料庫有所不同的點在於，mysql 的主從式資料庫是透過非同步的方式來備份資料到從資料庫。\n從寫入一筆資料到資料庫來分別兩者的區別\nmysql cluster : 會需要等待所有節點都寫入完成後，寫入才完成。\n若有節點寫入不完成，所有節點會一起 roll back。\nmysql 主從式資料庫 : 當主資料庫寫入後，對於主資料庫來說資料寫入已經完成，並會將該事件記錄到 bin log，再由從資料庫取得 bin log 後 replay 事件同步資料。\n若是從資料庫寫入失敗，主資料庫並不會因此 roll back，而從資料庫則會停止運作，資料維持在寫入失敗的這一刻，不會再更新。 可以參考(database-repliaction)沒有備份主資料庫的資料就設定了主從式會發生的狀況。\nmysql cluster 透過 two-phase commit 的機制來保證資料寫入所有節點。\ntwo-phase commit two-phase commit 是被設計用來處理所有參與節點是否 commit 或是 abort(roll back) transaction 的一種演算法。\n必須滿足以下條件：\n每個節點都要有穩定的儲存空間提供給 write-ahead log。 write-ahead log 指的是所有對 DB 的操作都必須先寫入在此log，才能對 DB 進行變動。 沒有節點會永遠處在崩潰狀態。 所有寫在 write-ahead log 的資料不會因為 node 的崩潰，而遺失或是損壞。 任意兩個節點可以彼此溝通。 需要有一個協調者(coordinator process)，向所有參與節點提出請求，詢問是否要 commit 或是 abort transaction，並根據回應來決定動作。\n">
-<meta property='og:url' content='http://localhost:1313/post/mysql-cluster/'>
+<meta property='og:url' content='https://example.com/post/mysql-cluster/'>
 <meta property='og:site_name' content='Jack&#39;s Note'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-06-14T14:19:51&#43;08:00'/><meta property='article:modified_time' content='2025-06-14T14:19:51&#43;08:00'/>
 <meta name="twitter:title" content="Mysql Cluster">
@@ -510,7 +510,7 @@
                 src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
                 
                 >
-            </script><script type="text/javascript" src="/ts/main.f7cd3f38cb3a232f30afc63001c7b35016dd7ce84029d841eef37b1873c1c01a.js" defer></script>
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
 <script>
     (function () {
         const customFont = document.createElement('link');
